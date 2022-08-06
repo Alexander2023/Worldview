@@ -1,0 +1,37 @@
+{
+  "frameWidth": 100,
+  "frameHeight": 20,
+  "frameDepth": 100,
+  "panels": [
+    {
+      "dimensions": [40, 15, 2],
+      "position": [-25, 7.5, -25],
+      "yRotation": 180
+    },
+    {
+      "dimensions": [40, 15, 2],
+      "position": [25, 7.5, -25],
+      "yRotation": 180
+    },
+    {
+      "dimensions": [40, 15, 2],
+      "position": [-25, 7.5, 25],
+      "yRotation": 180
+    },
+    {
+      "dimensions": [40, 15, 2],
+      "position": [25, 7.5, 25],
+      "yRotation": 180
+    },
+    {
+      "dimensions": [20, 10, 2],
+      "position": [-25, 5, 0],
+      "yRotation": 90
+    },
+    {
+      "dimensions": [20, 10, 2],
+      "position": [25, 5, 0],
+      "yRotation": 90
+    }
+  ]
+}
