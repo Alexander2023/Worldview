@@ -1,19 +1,38 @@
 import { useLoader } from "@react-three/fiber";
-import { Texture, TextureLoader } from "three";
+import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { TextureLoader } from "three";
 
-import roomState from './RoomState.json';
+import { RoomState, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
 import concreteImg from './images/concrete.jpg';
 import marbleImg from './images/marble.jpg';
+
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
+    io('ws://localhost:3001');
 
 /**
  * Generates a rectangular room populated with panels
  *
  * @returns A room populated with panels
  */
-function Room(): JSX.Element {
+function Room() {
+  const [roomState, setRoomState] = useState<RoomState | null>(null);
+
+  useEffect(() => {
+    socket.on('createdRoom', (serverRoomState) => {
+      setRoomState(serverRoomState);
+    });
+
+    socket.emit('createRoom');
+  }, []);
+
+  if (!roomState) {
+    return null;
+  }
+
   return (
     <group>
-      <Frame/>
+      <Frame {...roomState} />
       {roomState.panels.map(panel => (
         <mesh key={panel.position.join()}
               position={[panel.position[0], panel.position[1], panel.position[2]]}
@@ -36,8 +55,8 @@ function Room(): JSX.Element {
  *
  * @returns A frame of the room
  */
-function Frame(): JSX.Element {
-  const [concreteMap, marbleMap]: Texture[] = useLoader(TextureLoader, [
+function Frame(roomState: RoomState) {
+  const [concreteMap, marbleMap] = useLoader(TextureLoader, [
     concreteImg,
     marbleImg
   ]);
