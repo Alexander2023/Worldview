@@ -1,10 +1,10 @@
-export interface Panel {
+interface Panel {
   dimensions: number[];
   position: number[];
   yRotation: number;
 }
 
-export interface RoomState {
+interface RoomState {
   // relative to x-axis
   frameWidth: number;
   // relative to y-axis
@@ -14,10 +14,12 @@ export interface RoomState {
   panels: Panel[];
 }
 
-export interface ServerToClientEvents {
+interface ServerToClientEvents {
   createdRoom: (roomState: RoomState) => void;
 }
 
-export interface ClientToServerEvents {
+interface ClientToServerEvents {
   createRoom: () => void;
 }
+
+export { Panel, RoomState, ServerToClientEvents, ClientToServerEvents };
