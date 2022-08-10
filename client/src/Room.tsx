@@ -94,4 +94,4 @@ function Frame(roomState: RoomState) {
   )
 }
 
-export default Room;
+export { Room };

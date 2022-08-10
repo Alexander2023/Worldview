@@ -2,7 +2,7 @@ import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 
 import './App.css';
-import Room from './Room';
+import { Room } from './Room';
 
 function App() {
   return (
@@ -13,4 +13,4 @@ function App() {
   );
 }
 
-export default App;
+export { App };
