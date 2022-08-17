@@ -42,11 +42,16 @@ function Room(props: RoomProps) {
       <Frame roomState={roomState} {...props} />
       {roomState.panels.map(panel => (
         <BoundaryBox key={panel.position.join()} {...props} >
-          <mesh position={[panel.position[0], panel.position[1], panel.position[2]]}
-                rotation-y={panel.yRotation * (Math.PI / 180)} >
-            <boxBufferGeometry args={[panel.dimensions[0], panel.dimensions[1],
-                                     panel.dimensions[2]]} />
-            <meshStandardMaterial/>
+          <mesh
+            position={[panel.position[0], panel.position[1],
+                panel.position[2]]}
+            rotation-y={panel.yRotation * (Math.PI / 180)}
+          >
+            <boxBufferGeometry
+              args={[panel.dimensions[0], panel.dimensions[1],
+                  panel.dimensions[2]]}
+            />
+            <meshStandardMaterial />
           </mesh>
         </BoundaryBox>
       ))}
@@ -78,29 +83,45 @@ function Frame({roomState, ...props}: FrameProps) {
   return (
     <group>
       <BoundaryBox {...props} >
-        <mesh position={[0, roomState.frameHeight / 2, -roomState.frameDepth / 2]} >
-          <planeBufferGeometry args={[roomState.frameWidth, roomState.frameHeight]} />
+        <mesh
+          position={[0, roomState.frameHeight / 2, -roomState.frameDepth / 2]}
+        >
+          <planeBufferGeometry
+            args={[roomState.frameWidth, roomState.frameHeight]}
+          />
           <meshStandardMaterial map={concreteMap} />
         </mesh>
       </BoundaryBox>
       <BoundaryBox {...props} >
-        <mesh position={[-roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
-              rotation-y={Math.PI / 2} >
-          <planeBufferGeometry args={[roomState.frameDepth, roomState.frameHeight]} />
+        <mesh
+          position={[-roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
+          rotation-y={Math.PI / 2}
+        >
+          <planeBufferGeometry
+            args={[roomState.frameDepth, roomState.frameHeight]}
+          />
           <meshStandardMaterial map={concreteMap} />
         </mesh>
       </BoundaryBox>
       <BoundaryBox {...props} >
-        <mesh position={[0, roomState.frameHeight / 2, roomState.frameDepth / 2]}
-              rotation-y={Math.PI} >
-          <planeBufferGeometry args={[roomState.frameWidth, roomState.frameHeight]} />
+        <mesh
+          position={[0, roomState.frameHeight / 2, roomState.frameDepth / 2]}
+          rotation-y={Math.PI}
+        >
+          <planeBufferGeometry
+            args={[roomState.frameWidth, roomState.frameHeight]}
+          />
           <meshStandardMaterial map={concreteMap} />
         </mesh>
       </BoundaryBox>
       <BoundaryBox {...props} >
-        <mesh position={[roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
-              rotation-y={-Math.PI / 2} >
-          <planeBufferGeometry args={[roomState.frameDepth, roomState.frameHeight]} />
+        <mesh
+          position={[roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
+          rotation-y={-Math.PI / 2}
+        >
+          <planeBufferGeometry
+            args={[roomState.frameDepth, roomState.frameHeight]}
+          />
           <meshStandardMaterial map={concreteMap} />
         </mesh>
       </BoundaryBox>

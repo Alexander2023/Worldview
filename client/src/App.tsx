@@ -25,8 +25,10 @@ function App() {
 
   return (
     <Canvas>
-      <Room handleAddBoundaryBox={handleAddBoundaryBox}
-            handleRemoveBoundaryBox={handleRemoveBoundaryBox} />
+      <Room
+        handleAddBoundaryBox={handleAddBoundaryBox}
+        handleRemoveBoundaryBox={handleRemoveBoundaryBox}
+      />
       <User boundaryBoxes={boundaryBoxes} />
     </Canvas>
   );

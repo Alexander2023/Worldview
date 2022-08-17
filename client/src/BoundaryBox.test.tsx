@@ -8,8 +8,8 @@ test('calls handlers when mounting and unmounting', async () => {
   const renderer = await ReactThreeTestRenderer.create(
     <BoundaryBox {...props} >
       <mesh>
-        <boxBufferGeometry/>
-        <meshStandardMaterial/>
+        <boxBufferGeometry />
+        <meshStandardMaterial />
       </mesh>
     </BoundaryBox>
   );
