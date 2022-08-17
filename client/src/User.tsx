@@ -1,14 +1,21 @@
 import { PerspectiveCamera } from "@react-three/drei";
-import { useFrame } from '@react-three/fiber';
+import { RootState, useFrame } from '@react-three/fiber';
 import { useEffect, useState } from "react";
+import * as THREE from 'three';
 
 const MOVEMENT_SPEED = 20;
 const ROTATIONAL_SPEED = Math.PI / 2;
+const DEFAULT_HEIGHT = 5;
+const BOUNDARY_BOX_DIMENSIONS = [2, DEFAULT_HEIGHT, 2];
+
+interface UserProps {
+  boundaryBoxes: Map<number, THREE.Box3>;
+}
 
 /**
  * Generates a client-controlled first person perspective of the world
  */
-function User() {
+function User({boundaryBoxes}: UserProps) {
   const [moveFactor, setMoveFactor] = useState(0);
   const [rotateFactor, setRotateFactor] = useState(0);
 
@@ -42,18 +49,42 @@ function User() {
     }
   }, []);
 
-  useFrame((state, delta) => {
-    // position
-    state.camera.position.z += moveFactor * Math.cos(state.camera.rotation.y) *
-        MOVEMENT_SPEED * delta;
-    state.camera.position.x += moveFactor * Math.sin(state.camera.rotation.y) *
-        MOVEMENT_SPEED * delta;
+  const isCollision = (state: RootState, xMovement: number,
+      zMovement: number) => {
+    const simulation = state.camera.position.clone();
+    simulation.x += xMovement;
+    simulation.z += zMovement;
+    simulation.y -= DEFAULT_HEIGHT / 2;
 
-    // rotation
-    state.camera.rotation.y += rotateFactor * ROTATIONAL_SPEED * delta;
+    const userBoundaryBox = new THREE.Box3();
+    userBoundaryBox.setFromCenterAndSize(simulation, new THREE.Vector3(
+        ...BOUNDARY_BOX_DIMENSIONS));
+
+    for (const boundaryBox of boundaryBoxes.values()) {
+      if (userBoundaryBox.intersectsBox(boundaryBox)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  useFrame((state, delta) => {
+    const xMovement = moveFactor * Math.sin(state.camera.rotation.y) *
+        MOVEMENT_SPEED * delta;
+    const zMovement = moveFactor * Math.cos(state.camera.rotation.y) *
+        MOVEMENT_SPEED * delta;
+    const yRotation = rotateFactor * ROTATIONAL_SPEED * delta;
+
+    state.camera.rotation.y += yRotation;
+
+    if (!isCollision(state, xMovement, zMovement)) {
+      state.camera.position.x += xMovement;
+      state.camera.position.z += zMovement;
+    }
   });
 
-  return <PerspectiveCamera makeDefault position={[0, 5, 0]} />;
+  return <PerspectiveCamera makeDefault position-y={DEFAULT_HEIGHT} />;
 }
 
 export { User };
