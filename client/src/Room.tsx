@@ -1,16 +1,13 @@
 import { useLoader } from "@react-three/fiber";
-import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { useContext, useEffect, useState } from "react";
 import { TextureLoader } from "three";
 
-import { RoomState, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
+import { RoomState } from '../../shared/types';
 import { BoundaryBox } from "./BoundaryBox";
+import { SocketContext } from "./context/socket";
 import concreteImg from './images/concrete.jpg';
 import marbleImg from './images/marble.jpg';
 import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
-
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
-    io('ws://localhost:3001');
 
 interface RoomProps {
   handleAddBoundaryBox: HandleAddBoundaryBox;
@@ -23,6 +20,7 @@ interface RoomProps {
  * @returns A room populated with panels
  */
 function Room(props: RoomProps) {
+  const socket = useContext(SocketContext);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
 
   useEffect(() => {

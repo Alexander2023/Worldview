@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { useCallback, useState } from 'react';
 
 import './App.css';
+import { socket, SocketContext } from './context/socket';
 import { Room } from './Room';
 import { User } from './User';
 
@@ -25,11 +26,13 @@ function App() {
 
   return (
     <Canvas>
-      <Room
-        handleAddBoundaryBox={handleAddBoundaryBox}
-        handleRemoveBoundaryBox={handleRemoveBoundaryBox}
-      />
-      <User boundaryBoxes={boundaryBoxes} />
+      <SocketContext.Provider value={socket} >
+        <Room
+          handleAddBoundaryBox={handleAddBoundaryBox}
+          handleRemoveBoundaryBox={handleRemoveBoundaryBox}
+        />
+        <User boundaryBoxes={boundaryBoxes} />
+      </SocketContext.Provider>
     </Canvas>
   );
 }
