@@ -29,7 +29,7 @@ function Room(props: RoomProps) {
     });
 
     socket.emit('createRoom');
-  }, []);
+  }, [socket]);
 
   if (!roomState) {
     return null;
