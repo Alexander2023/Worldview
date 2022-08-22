@@ -1,0 +1,38 @@
+#control-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 60vw;
+  height: 44vh;
+  transition: bottom 0.3s;
+  left: 20vw;
+  bottom: calc(36px - 44vh);
+  background-color: white;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  border: 1px solid #E5E4E2;
+  box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+  z-index: 1;
+}
+
+#control-panel-slider {
+  flex: 0 0 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  cursor: pointer;
+}
+
+#control-panel-slider-button {
+  width: 36px;
+  height: 8px;
+  background-color: #E5E4E2;
+  border-radius: 16px;
+}
+
+#control-panel-content {
+  flex: 1 1 auto;
+}

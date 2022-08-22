@@ -4,6 +4,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { Avatar as AvatarType } from '../../shared/types';
 import { Avatar } from './Avatar';
 import { SocketContext } from './context/socket';
+import { ControlPanel } from './ControlPanel';
 import { Room } from './Room';
 import { User } from './User';
 
@@ -37,20 +38,23 @@ function World() {
   }, [socket]);
 
   return (
-    <Canvas>
-      <Room
-        handleAddBoundaryBox={handleAddBoundaryBox}
-        handleRemoveBoundaryBox={handleRemoveBoundaryBox}
-      />
-      <User boundaryBoxes={boundaryBoxes} />
-      {avatars.map(([id, avatar]) => (
-        <Avatar
-          key={id}
-          position={avatar.position}
-          yRotation={avatar.yRotation}
+    <>
+      <ControlPanel />
+      <Canvas>
+        <Room
+          handleAddBoundaryBox={handleAddBoundaryBox}
+          handleRemoveBoundaryBox={handleRemoveBoundaryBox}
         />
-      ))}
-    </Canvas>
+        <User boundaryBoxes={boundaryBoxes} />
+        {avatars.map(([id, avatar]) => (
+          <Avatar
+            key={id}
+            position={avatar.position}
+            yRotation={avatar.yRotation}
+          />
+        ))}
+      </Canvas>
+    </>
   )
 }
 
