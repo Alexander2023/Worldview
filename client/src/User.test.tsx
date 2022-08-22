@@ -14,6 +14,12 @@ const dispatchKeyboardEvent = async (type: string, key: string) => {
   });
 };
 
+jest.mock('socket.io-client', () => ({
+  io: jest.fn(() => ({
+    emit: jest.fn()
+  }))
+}));
+
 beforeEach(() => {
   document.addEventListener = jest.fn((event, callback) => {
     eventMap.set(event, callback);

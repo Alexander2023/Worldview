@@ -1,12 +1,14 @@
 import { PerspectiveCamera } from "@react-three/drei";
 import { RootState, useFrame } from '@react-three/fiber';
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as THREE from 'three';
+import { CUBE_SIZE } from "./Avatar";
+import { SocketContext } from "./context/socket";
 
 const MOVEMENT_SPEED = 20;
 const ROTATIONAL_SPEED = Math.PI / 2;
 const DEFAULT_HEIGHT = 5;
-const BOUNDARY_BOX_DIMENSIONS = [2, DEFAULT_HEIGHT, 2];
+const CUBE_DIAGONAL = Math.sqrt(2) * CUBE_SIZE;
 
 interface UserProps {
   boundaryBoxes: Map<number, THREE.Box3>;
@@ -16,6 +18,7 @@ interface UserProps {
  * Generates a client-controlled first person perspective of the world
  */
 function User({boundaryBoxes}: UserProps) {
+  const socket = useContext(SocketContext);
   const [moveFactor, setMoveFactor] = useState(0);
   const [rotateFactor, setRotateFactor] = useState(0);
 
@@ -57,8 +60,8 @@ function User({boundaryBoxes}: UserProps) {
     simulation.y -= DEFAULT_HEIGHT / 2;
 
     const userBoundaryBox = new THREE.Box3();
-    userBoundaryBox.setFromCenterAndSize(simulation, new THREE.Vector3(
-        ...BOUNDARY_BOX_DIMENSIONS));
+    userBoundaryBox.setFromCenterAndSize(simulation,
+        new THREE.Vector3(CUBE_DIAGONAL, DEFAULT_HEIGHT, CUBE_DIAGONAL));
 
     for (const boundaryBox of boundaryBoxes.values()) {
       if (userBoundaryBox.intersectsBox(boundaryBox)) {
@@ -82,6 +85,9 @@ function User({boundaryBoxes}: UserProps) {
       state.camera.position.x += xMovement;
       state.camera.position.z += zMovement;
     }
+
+    socket.emit('sendInput', {position: state.camera.position.toArray(),
+        yRotation: state.camera.rotation.y});
   });
 
   return <PerspectiveCamera makeDefault position-y={DEFAULT_HEIGHT} />;

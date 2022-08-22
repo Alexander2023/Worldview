@@ -1,6 +1,9 @@
 import { Canvas } from '@react-three/fiber';
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
+import { Avatar as AvatarType } from '../../shared/types';
+import { Avatar } from './Avatar';
+import { SocketContext } from './context/socket';
 import { Room } from './Room';
 import { User } from './User';
 
@@ -8,8 +11,10 @@ import { User } from './User';
  * Generates a 3D interactive world
  */
 function World() {
+  const socket = useContext(SocketContext);
   const [boundaryBoxes, setBoundaryBoxes] = useState(new Map<number,
       THREE.Box3>());
+  const [avatars, setAvatars] = useState<[string, AvatarType][]>([]);
 
   const handleAddBoundaryBox = useCallback((key: number, value: THREE.Box3) => {
     setBoundaryBoxes(prevBoundaryBoxes => {
@@ -25,6 +30,12 @@ function World() {
     });
   }, []);
 
+  useEffect(() => {
+    socket.on('update', newAvatars => {
+      setAvatars(newAvatars);
+    });
+  }, [socket]);
+
   return (
     <Canvas>
       <Room
@@ -32,6 +43,13 @@ function World() {
         handleRemoveBoundaryBox={handleRemoveBoundaryBox}
       />
       <User boundaryBoxes={boundaryBoxes} />
+      {avatars.map(([id, avatar]) => (
+        <Avatar
+          key={id}
+          position={avatar.position}
+          yRotation={avatar.yRotation}
+        />
+      ))}
     </Canvas>
   )
 }

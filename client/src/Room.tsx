@@ -24,11 +24,11 @@ function Room(props: RoomProps) {
   const [roomState, setRoomState] = useState<RoomState | null>(null);
 
   useEffect(() => {
-    socket.on('createdRoom', (serverRoomState) => {
+    socket.on('receiveRoom', (serverRoomState) => {
       setRoomState(serverRoomState);
     });
 
-    socket.emit('createRoom');
+    socket.emit('joinRoom');
   }, [socket]);
 
   if (!roomState) {

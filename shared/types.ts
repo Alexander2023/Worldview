@@ -14,12 +14,19 @@ interface RoomState {
   panels: Panel[];
 }
 
+interface Avatar {
+  position: number[];
+  yRotation: number;
+}
+
 interface ServerToClientEvents {
-  createdRoom: (roomState: RoomState) => void;
+  receiveRoom: (roomState: RoomState) => void;
+  update: (avatars: [string, Avatar][]) => void;
 }
 
 interface ClientToServerEvents {
-  createRoom: () => void;
+  joinRoom: () => void;
+  sendInput: (avatar: Avatar) => void;
 }
 
-export { Panel, RoomState, ServerToClientEvents, ClientToServerEvents };
+export { Panel, RoomState, Avatar, ServerToClientEvents, ClientToServerEvents };
