@@ -18,6 +18,15 @@ jest.mock('socket.io-client', () => ({
   }))
 }));
 
+jest.mock('@react-three/fiber', () => {
+  const originalModule = jest.requireActual('@react-three/fiber');
+
+  return {
+    ...originalModule,
+    useLoader: () => [null, null]
+  }
+})
+
 test('renders non-null room when server sends room state', async () => {
   const roomProps = {handleAddBoundaryBox: jest.fn(),
     handleRemoveBoundaryBox: jest.fn(),

@@ -1,6 +1,6 @@
-import { ThreeEvent } from "@react-three/fiber";
+import { ThreeEvent, useLoader } from "@react-three/fiber";
 import { useContext, useEffect, useState } from "react";
-import { Texture, TextureLoader, Vector2 } from "three";
+import { TextureLoader, Vector2 } from "three";
 
 import { RoomState } from '../../shared/types';
 import { BoundaryBox } from "./BoundaryBox";
@@ -103,14 +103,10 @@ interface FrameProps {
  * @returns A frame of the room
  */
 function Frame({handleScreenPlacementClick, roomState, ...props}: FrameProps) {
-  const [concreteMap, setConcreteMap] = useState<Texture | null>(null);
-  const [marbleMap, setMarbleMap] = useState<Texture | null>(null);
-
-  useEffect(() => {
-    const textureLoader = new TextureLoader();
-    setConcreteMap(textureLoader.load(concreteImg));
-    setMarbleMap(textureLoader.load(marbleImg));
-  }, []);
+  const [concreteTexture, marbleTexture] = useLoader(TextureLoader, [
+    concreteImg,
+    marbleImg
+  ]);
 
   return (
     <group>
@@ -122,7 +118,7 @@ function Frame({handleScreenPlacementClick, roomState, ...props}: FrameProps) {
           <planeBufferGeometry
             args={[roomState.frameWidth, roomState.frameHeight]}
           />
-          <meshStandardMaterial map={concreteMap} />
+          <meshStandardMaterial map={concreteTexture} />
         </mesh>
       </BoundaryBox>
       <BoundaryBox {...props} >
@@ -134,7 +130,7 @@ function Frame({handleScreenPlacementClick, roomState, ...props}: FrameProps) {
           <planeBufferGeometry
             args={[roomState.frameDepth, roomState.frameHeight]}
           />
-          <meshStandardMaterial map={concreteMap} />
+          <meshStandardMaterial map={concreteTexture} />
         </mesh>
       </BoundaryBox>
       <BoundaryBox {...props} >
@@ -146,7 +142,7 @@ function Frame({handleScreenPlacementClick, roomState, ...props}: FrameProps) {
           <planeBufferGeometry
             args={[roomState.frameWidth, roomState.frameHeight]}
           />
-          <meshStandardMaterial map={concreteMap} />
+          <meshStandardMaterial map={concreteTexture} />
         </mesh>
       </BoundaryBox>
       <BoundaryBox {...props} >
@@ -158,16 +154,16 @@ function Frame({handleScreenPlacementClick, roomState, ...props}: FrameProps) {
           <planeBufferGeometry
             args={[roomState.frameDepth, roomState.frameHeight]}
           />
-          <meshStandardMaterial map={concreteMap} />
+          <meshStandardMaterial map={concreteTexture} />
         </mesh>
       </BoundaryBox>
       <mesh position={[0, roomState.frameHeight, 0]} rotation-x={Math.PI / 2} >
         <planeGeometry args={[roomState.frameWidth, roomState.frameDepth]} />
-        <meshStandardMaterial map={concreteMap} />
+        <meshStandardMaterial map={concreteTexture} />
       </mesh>
       <mesh rotation-x={-Math.PI / 2} >
         <planeGeometry args={[roomState.frameWidth, roomState.frameDepth]} />
-        <meshBasicMaterial map={marbleMap} />
+        <meshBasicMaterial map={marbleTexture} />
       </mesh>
     </group>
   )
