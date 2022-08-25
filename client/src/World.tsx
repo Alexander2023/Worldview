@@ -13,9 +13,11 @@ import { User } from './User';
  */
 function World() {
   const socket = useContext(SocketContext);
+
   const [boundaryBoxes, setBoundaryBoxes] = useState(new Map<number,
       THREE.Box3>());
   const [avatars, setAvatars] = useState<[string, AvatarType][]>([]);
+  const [isControlPanelOpen, setIsControlPanelOpen] = useState(false);
 
   const handleAddBoundaryBox = useCallback((key: number, value: THREE.Box3) => {
     setBoundaryBoxes(prevBoundaryBoxes => {
@@ -39,11 +41,16 @@ function World() {
 
   return (
     <>
-      <ControlPanel />
+      <ControlPanel
+        isOpen={isControlPanelOpen}
+        setIsOpen ={setIsControlPanelOpen}
+      />
       <Canvas>
         <Room
           handleAddBoundaryBox={handleAddBoundaryBox}
           handleRemoveBoundaryBox={handleRemoveBoundaryBox}
+          isControlPanelOpen={isControlPanelOpen}
+          setIsControlPanelOpen={setIsControlPanelOpen}
         />
         <User boundaryBoxes={boundaryBoxes} />
         {avatars.map(([id, avatar]) => (
