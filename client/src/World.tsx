@@ -39,7 +39,13 @@ function World() {
 
   useEffect(() => {
     socket.on('update', newAvatars => {
-      setAvatars(newAvatars);
+      setAvatars(prevAvatars => {
+        if (JSON.stringify(prevAvatars) === JSON.stringify(newAvatars)) {
+          return prevAvatars;
+        }
+
+        return newAvatars;
+      });
     });
   }, [socket]);
 
