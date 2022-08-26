@@ -3,11 +3,12 @@ import { useContext, useEffect, useState } from "react";
 import { TextureLoader, Vector2 } from "three";
 
 import { RoomState } from '../../shared/types';
-import { BoundaryBox } from "./BoundaryBox";
 import { SocketContext } from "./context/socket";
 import concreteImg from './images/concrete.jpg';
 import marbleImg from './images/marble.jpg';
+import { Panel } from "./Panel";
 import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
+import { Wall } from "./Wall";
 
 /*
  * Max acceptable distance between a click's origin and destination
@@ -66,21 +67,13 @@ function Room(props: RoomProps) {
         handleScreenPlacementClick={handleScreenPlacementClick}
         {...otherProps}
       />
-      {roomState.panels.map(panel => (
-        <BoundaryBox key={panel.position.join()} {...otherProps} >
-          <mesh
-            position={[panel.position[0], panel.position[1],
-                panel.position[2]]}
-            rotation-y={panel.yRotation * (Math.PI / 180)}
-            onClick={handleScreenPlacementClick}
-          >
-            <boxBufferGeometry
-              args={[panel.dimensions[0], panel.dimensions[1],
-                  panel.dimensions[2]]}
-            />
-            <meshStandardMaterial />
-          </mesh>
-        </BoundaryBox>
+      {roomState.panels.map(panelData => (
+        <Panel
+          key={panelData.position.join()}
+          panelData={panelData}
+          handleScreenPlacementClick={handleScreenPlacementClick}
+          {...otherProps}
+        />
       ))}
       <ambientLight intensity={0.3} />
       <directionalLight intensity={1.5} position-y={roomState.frameHeight} />
@@ -110,53 +103,38 @@ function Frame({handleScreenPlacementClick, roomState, ...props}: FrameProps) {
 
   return (
     <group>
-      <BoundaryBox {...props} >
-        <mesh
-          position={[0, roomState.frameHeight / 2, -roomState.frameDepth / 2]}
-          onClick={handleScreenPlacementClick}
-        >
-          <planeBufferGeometry
-            args={[roomState.frameWidth, roomState.frameHeight]}
-          />
-          <meshStandardMaterial map={concreteTexture} />
-        </mesh>
-      </BoundaryBox>
-      <BoundaryBox {...props} >
-        <mesh
-          position={[-roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
-          rotation-y={Math.PI / 2}
-          onClick={handleScreenPlacementClick}
-        >
-          <planeBufferGeometry
-            args={[roomState.frameDepth, roomState.frameHeight]}
-          />
-          <meshStandardMaterial map={concreteTexture} />
-        </mesh>
-      </BoundaryBox>
-      <BoundaryBox {...props} >
-        <mesh
-          position={[0, roomState.frameHeight / 2, roomState.frameDepth / 2]}
-          rotation-y={Math.PI}
-          onClick={handleScreenPlacementClick}
-        >
-          <planeBufferGeometry
-            args={[roomState.frameWidth, roomState.frameHeight]}
-          />
-          <meshStandardMaterial map={concreteTexture} />
-        </mesh>
-      </BoundaryBox>
-      <BoundaryBox {...props} >
-        <mesh
-          position={[roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
-          rotation-y={-Math.PI / 2}
-          onClick={handleScreenPlacementClick}
-        >
-          <planeBufferGeometry
-            args={[roomState.frameDepth, roomState.frameHeight]}
-          />
-          <meshStandardMaterial map={concreteTexture} />
-        </mesh>
-      </BoundaryBox>
+      <Wall
+        handleScreenPlacementClick={handleScreenPlacementClick}
+        texture={concreteTexture}
+        position={[0, roomState.frameHeight / 2, -roomState.frameDepth / 2]}
+        yRotation={0}
+        scale={[roomState.frameWidth, roomState.frameHeight]}
+        {...props}
+      />
+      <Wall
+        handleScreenPlacementClick={handleScreenPlacementClick}
+        texture={concreteTexture}
+        position={[-roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
+        yRotation={Math.PI / 2}
+        scale={[roomState.frameDepth, roomState.frameHeight]}
+        {...props}
+      />
+      <Wall
+        handleScreenPlacementClick={handleScreenPlacementClick}
+        texture={concreteTexture}
+        position={[0, roomState.frameHeight / 2, roomState.frameDepth / 2]}
+        yRotation={Math.PI}
+        scale={[roomState.frameWidth, roomState.frameHeight]}
+        {...props}
+      />
+      <Wall
+        handleScreenPlacementClick={handleScreenPlacementClick}
+        texture={concreteTexture}
+        position={[roomState.frameWidth / 2, roomState.frameHeight / 2, 0]}
+        yRotation={-Math.PI / 2}
+        scale={[roomState.frameDepth, roomState.frameHeight]}
+        {...props}
+      />
       <mesh position={[0, roomState.frameHeight, 0]} rotation-x={Math.PI / 2} >
         <planeGeometry args={[roomState.frameWidth, roomState.frameDepth]} />
         <meshStandardMaterial map={concreteTexture} />

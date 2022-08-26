@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { Box3, Object3D } from 'three';
 
 import { Avatar as AvatarType } from '../../shared/types';
 import { Avatar } from './Avatar';
@@ -19,9 +20,12 @@ function World() {
   const [avatars, setAvatars] = useState<[string, AvatarType][]>([]);
   const [isControlPanelOpen, setIsControlPanelOpen] = useState(false);
 
-  const handleAddBoundaryBox = useCallback((key: number, value: THREE.Box3) => {
+  const handleAddBoundaryBox = useCallback((object3D: Object3D) => {
+    const boundaryBox = new Box3();
+    boundaryBox.setFromObject(object3D);
+
     setBoundaryBoxes(prevBoundaryBoxes => {
-      return new Map([...prevBoundaryBoxes, [key, value]]);
+      return new Map([...prevBoundaryBoxes, [object3D.id, boundaryBox]]);
     });
   }, []);
 

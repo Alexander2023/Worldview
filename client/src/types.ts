@@ -1,4 +1,4 @@
-type HandleAddBoundaryBox = (key: number, value: THREE.Box3) => void;
+type HandleAddBoundaryBox = (object3D: THREE.Object3D) => void;
 
 type HandleRemoveBoundaryBox = (key: number) => void;
 
