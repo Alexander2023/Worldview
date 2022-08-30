@@ -2,6 +2,11 @@ import ReactThreeTestRenderer from '@react-three/test-renderer'
 import * as THREE from 'three';
 import { User } from './User';
 
+// since there is no React Three Fiber canvas while testing, we can
+// ignore error messages from listeners by attaching to this mock
+const mockCanvas = document.createElement('div');
+mockCanvas.id = 'three-canvas';
+
 let boundaryBoxes = new Map<number, THREE.Box3>();
 let eventMap = new Map<string, EventListenerOrEventListenerObject>();
 
@@ -21,12 +26,16 @@ jest.mock('socket.io-client', () => ({
 }));
 
 beforeEach(() => {
+  document.body.appendChild(mockCanvas);
+
   document.addEventListener = jest.fn((event, callback) => {
     eventMap.set(event, callback);
   });
 });
 
 afterEach(() => {
+  document.body.removeChild(mockCanvas);
+
   boundaryBoxes.clear();
   eventMap.clear();
 });

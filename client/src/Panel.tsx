@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { BufferGeometry, Material, Mesh, Object3D } from "three";
 
 import { Panel as PanelType } from "../../shared/types";
+import { EFFECTS_OBJECT_NAMES } from "./constants";
 import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
 
 interface PanelProps {
@@ -27,6 +28,7 @@ function Panel(props: PanelProps) {
   return (
     <mesh
       ref={ref}
+      name={EFFECTS_OBJECT_NAMES.PANEL}
       position={[panelData.position[0], panelData.position[1],
           panelData.position[2]]}
       rotation-y={panelData.yRotation * (Math.PI / 180)}

@@ -55,7 +55,7 @@ function World() {
         isOpen={isControlPanelOpen}
         setIsOpen ={setIsControlPanelOpen}
       />
-      <Canvas>
+      <Canvas id={"three-canvas"} >
         <Room
           handleAddBoundaryBox={handleAddBoundaryBox}
           handleRemoveBoundaryBox={handleRemoveBoundaryBox}

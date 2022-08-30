@@ -1,6 +1,7 @@
 import { ThreeEvent } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { BufferGeometry, Material, Mesh, Object3D, Texture } from "three";
+import { EFFECTS_OBJECT_NAMES } from "./constants";
 
 import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
 
@@ -29,6 +30,7 @@ function Wall(props: WallProps) {
   return (
     <mesh
       ref={ref}
+      name={EFFECTS_OBJECT_NAMES.WALL}
       position={[position[0], position[1], position[2]]}
       rotation-y={yRotation}
       onClick={handleScreenPlacementClick}

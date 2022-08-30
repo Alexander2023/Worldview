@@ -1,9 +1,10 @@
 import { PerspectiveCamera } from "@react-three/drei";
 import { RootState, useFrame } from '@react-three/fiber';
 import { useContext, useEffect, useState } from "react";
-import * as THREE from 'three';
+import { Box3, Vector3 } from "three";
 import { CUBE_SIZE } from "./Avatar";
 import { SocketContext } from "./context/socket";
+import { usePointerEffect } from "./usePointerEffect";
 
 const MOVEMENT_SPEED = 20;
 const ROTATIONAL_SPEED = Math.PI / 2;
@@ -19,11 +20,14 @@ interface UserProps {
  */
 function User({boundaryBoxes}: UserProps) {
   const socket = useContext(SocketContext);
+
   const [moveFactor, setMoveFactor] = useState(0);
   const [rotateFactor, setRotateFactor] = useState(0);
 
+  usePointerEffect(moveFactor !== 0 || rotateFactor !== 0);
+
   useEffect(() => {
-    const keyDownListener = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowUp') {
         setMoveFactor(-1);
       } else if (event.key === 'ArrowDown') {
@@ -33,23 +37,23 @@ function User({boundaryBoxes}: UserProps) {
       } else if (event.key === 'ArrowRight') {
         setRotateFactor(-1);
       }
-    }
+    };
 
-    const keyUpListener = (event: KeyboardEvent) => {
+    const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         setMoveFactor(0);
       } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
         setRotateFactor(0);
       }
-    }
+    };
 
-    document.addEventListener('keydown', keyDownListener);
-    document.addEventListener('keyup', keyUpListener);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      document.removeEventListener('keydown', keyDownListener);
-      document.removeEventListener('keyup', keyUpListener);
-    }
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+    };
   }, []);
 
   const isCollision = (state: RootState, xMovement: number,
@@ -59,9 +63,9 @@ function User({boundaryBoxes}: UserProps) {
     simulation.z += zMovement;
     simulation.y -= DEFAULT_HEIGHT / 2;
 
-    const userBoundaryBox = new THREE.Box3();
-    userBoundaryBox.setFromCenterAndSize(simulation,
-        new THREE.Vector3(CUBE_DIAGONAL, DEFAULT_HEIGHT, CUBE_DIAGONAL));
+    const userBoundaryBox = new Box3();
+    userBoundaryBox.setFromCenterAndSize(simulation, new Vector3(CUBE_DIAGONAL,
+        DEFAULT_HEIGHT, CUBE_DIAGONAL));
 
     for (const boundaryBox of boundaryBoxes.values()) {
       if (userBoundaryBox.intersectsBox(boundaryBox)) {

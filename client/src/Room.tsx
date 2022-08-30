@@ -3,18 +3,13 @@ import { useContext, useEffect, useState } from "react";
 import { TextureLoader, Vector2 } from "three";
 
 import { RoomState } from '../../shared/types';
+import { MAX_CLICKABLE_DIST } from "./constants";
 import { SocketContext } from "./context/socket";
 import concreteImg from './images/concrete.jpg';
 import marbleImg from './images/marble.jpg';
 import { Panel } from "./Panel";
 import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
 import { Wall } from "./Wall";
-
-/*
- * Max acceptable distance between a click's origin and destination
- * when ignoring the y dimension of the points
- */
-const MAX_SCREEN_PLACEMENT_CLICK_DIST = 20;
 
 interface RoomProps {
   handleAddBoundaryBox: HandleAddBoundaryBox;
@@ -40,7 +35,7 @@ function Room(props: RoomProps) {
     const xzDestination = new Vector2(event.point.x, event.point.z);
 
     // ignores y dimension to allow for maximal vertical space usage
-    if (xzOrigin.distanceTo(xzDestination) <= MAX_SCREEN_PLACEMENT_CLICK_DIST &&
+    if (xzOrigin.distanceTo(xzDestination) <= MAX_CLICKABLE_DIST &&
         !isControlPanelOpen) {
       setIsControlPanelOpen(true);
     }
