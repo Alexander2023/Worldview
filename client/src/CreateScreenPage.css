@@ -1,0 +1,17 @@
+#create-screen-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 20px;
+}
+
+#create-screen-place {
+  cursor: pointer;
+}
+
+#create-screen-cancel {
+  cursor: pointer;
+}
