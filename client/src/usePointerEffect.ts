@@ -21,12 +21,16 @@ const computePointer = (event: PointerEvent | MouseEvent) => {
  * when interacting with in-world objects
  *
  * @param isCameraMoving true if camera state is changing, false otherwise
+ * @param isPlacingScreen true if placing screen, false otherwise
+ * @param handleChosenScreenPlacement callback function for when the user
+ *    chooses a spot to place the screen
  */
 function usePointerEffect(isCameraMoving: boolean, isPlacingScreen: boolean,
     handleChosenScreenPlacement: HandleChosenScreenPlacement) {
   const canvasRef = useRef(document.getElementById('three-canvas'));
 
-  const [pointer, setPointer] = useState<Vector2 | null>(null);
+  const [initialPointer, setInitialPointer] = useState<Vector2 | null>(null);
+  const [hasPointerMoved, setHasPointerMoved] = useState(false);
   const [raycaster] = useState(new Raycaster());
   const {camera, scene} = useThree();
 
@@ -58,20 +62,22 @@ function usePointerEffect(isCameraMoving: boolean, isPlacingScreen: boolean,
     }
   };
 
-  useFrame(() => {
-    if (pointer && isCameraMoving) {
-      updateCursorStyle(pointer);
+  useFrame((state) => {
+    if (hasPointerMoved) {
+      updateCursorStyle(state.pointer);
+    } else if (initialPointer && isCameraMoving) {
+      updateCursorStyle(initialPointer);
     }
   });
 
   const handlePointerOver = (event: PointerEvent) => {
-    setPointer(computePointer(event));
+    setInitialPointer(computePointer(event));
   };
 
-  const handlePointerMove = (event: PointerEvent) => {
-    const pointer = computePointer(event);
-    setPointer(pointer);
-    updateCursorStyle(pointer);
+  const handlePointerMove = () => {
+    if (!hasPointerMoved) {
+      setHasPointerMoved(true);
+    }
   };
 
   const handleClick = (event: MouseEvent) => {
@@ -81,10 +87,7 @@ function usePointerEffect(isCameraMoving: boolean, isPlacingScreen: boolean,
 
     event.stopPropagation();
 
-    const pointer = computePointer(event);
-    setPointer(pointer);
-
-    const intersection = getClickableIntersection(pointer);
+    const intersection = getClickableIntersection(computePointer(event));
     if (!intersection || !intersection.face) {
       return;
     }
