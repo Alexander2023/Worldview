@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { Box3, Vector3 } from "three";
 import { CUBE_SIZE } from "./Avatar";
 import { SocketContext } from "./context/socket";
+import { HandleChosenScreenPlacement } from "./types";
 import { usePointerEffect } from "./usePointerEffect";
 
 const MOVEMENT_SPEED = 20;
@@ -13,18 +14,23 @@ const CUBE_DIAGONAL = Math.sqrt(2) * CUBE_SIZE;
 
 interface UserProps {
   boundaryBoxes: Map<number, THREE.Box3>;
+  isPlacingScreen: boolean;
+  handleChosenScreenPlacement: HandleChosenScreenPlacement;
 }
 
 /**
  * Generates a client-controlled first person perspective of the world
  */
-function User({boundaryBoxes}: UserProps) {
+function User(props: UserProps) {
+  const {boundaryBoxes, isPlacingScreen, handleChosenScreenPlacement} = props;
+
   const socket = useContext(SocketContext);
 
   const [moveFactor, setMoveFactor] = useState(0);
   const [rotateFactor, setRotateFactor] = useState(0);
 
-  usePointerEffect(moveFactor !== 0 || rotateFactor !== 0);
+  usePointerEffect(moveFactor !== 0 || rotateFactor !== 0, isPlacingScreen,
+      handleChosenScreenPlacement);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

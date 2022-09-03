@@ -1,44 +1,67 @@
 import './CreateScreenPage.css';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { HandleScreenConfig, ScreenConfig } from './types';
 
 interface CreateScreenPageProps {
   setIsControlPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isPlacingScreen: boolean;
+  setScreenConfig: React.Dispatch<React.SetStateAction<ScreenConfig | null>>;
+  handleScreenConfig: HandleScreenConfig;
 }
 
 /**
  * Generates a page for creating in-world screens of images
  */
-function CreateScreenPage({setIsControlPanelOpen}: CreateScreenPageProps) {
+function CreateScreenPage(props: CreateScreenPageProps) {
+  const {setIsControlPanelOpen, isPlacingScreen, setScreenConfig,
+      handleScreenConfig} = props;
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [image, setImage] = useState<File | null>(null);
-  const [isPlacing, setIsPlacing] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setImage(event.target.files[0]);
+
+      if (isPlacingScreen) {
+        handleScreenConfig(event.target.files[0]);
+      }
     } else {
       setImage(null);
+      setScreenConfig(null);
     }
-
-    setIsPlacing(false);
   };
 
   const handleSubmitClick = () => {
     if (image) {
-      setIsPlacing(true);
       setIsControlPanelOpen(false);
+      handleScreenConfig(image);
     } else {
       alert('Must choose an image before placement')
     }
   };
 
   const handleCancelClick = () => {
-    setIsPlacing(false);
+    setScreenConfig(null);
   };
+
+  useEffect(() => {
+    if (inputRef.current && !isPlacingScreen) {
+      inputRef.current.value = '';
+      setImage(null);
+    }
+  }, [isPlacingScreen]);
 
   return (
     <div id="create-screen-page" >
-      <input type="file" accept="image/*" onChange={handleInputChange} />
-      {isPlacing ? (
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleInputChange}
+      />
+      {isPlacingScreen ? (
         <button id="create-screen-cancel" onClick={handleCancelClick} >
           Cancel
         </button>

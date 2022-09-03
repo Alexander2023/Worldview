@@ -2,16 +2,18 @@ import { ThreeEvent, useLoader } from "@react-three/fiber";
 import { useContext, useEffect, useState } from "react";
 import { TextureLoader, Vector2 } from "three";
 
-import { RoomState } from '../../shared/types';
+import { RoomState, Screen as ScreenType } from '../../shared/types';
 import { MAX_CLICKABLE_DIST } from "./constants";
 import { SocketContext } from "./context/socket";
 import concreteImg from './images/concrete.jpg';
 import marbleImg from './images/marble.jpg';
 import { Panel } from "./Panel";
+import { Screen } from "./Screen";
 import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
 import { Wall } from "./Wall";
 
 interface RoomProps {
+  screens: ScreenType[];
   handleAddBoundaryBox: HandleAddBoundaryBox;
   handleRemoveBoundaryBox: HandleRemoveBoundaryBox;
   isControlPanelOpen: boolean;
@@ -24,7 +26,7 @@ interface RoomProps {
  * @returns A room populated with panels
  */
 function Room(props: RoomProps) {
-  const {isControlPanelOpen, setIsControlPanelOpen,
+  const {screens, isControlPanelOpen, setIsControlPanelOpen,
       ...otherProps} = props;
 
   const socket = useContext(SocketContext);
@@ -62,6 +64,12 @@ function Room(props: RoomProps) {
         handleScreenPlacementClick={handleScreenPlacementClick}
         {...otherProps}
       />
+      {screens.map(screenData => (
+        <Screen
+          key={screenData.position.join()}
+          screenData={screenData}
+        />
+      ))}
       {roomState.panels.map(panelData => (
         <Panel
           key={panelData.position.join()}

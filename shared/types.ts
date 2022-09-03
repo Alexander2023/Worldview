@@ -19,6 +19,13 @@ interface Avatar {
   yRotation: number;
 }
 
+interface Screen {
+  dataUrl: string;
+  dimensions: number[];
+  position: number[];
+  yRotation: number;
+}
+
 interface ServerToClientEvents {
   receiveRoom: (roomState: RoomState) => void;
   update: (avatars: [string, Avatar][]) => void;
@@ -29,4 +36,4 @@ interface ClientToServerEvents {
   sendInput: (avatar: Avatar) => void;
 }
 
-export { Panel, RoomState, Avatar, ServerToClientEvents, ClientToServerEvents };
+export { Panel, RoomState, Avatar, Screen, ServerToClientEvents, ClientToServerEvents };

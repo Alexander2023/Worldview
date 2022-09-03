@@ -28,10 +28,13 @@ jest.mock('@react-three/fiber', () => {
 })
 
 test('renders non-null room when server sends room state', async () => {
-  const roomProps = {handleAddBoundaryBox: jest.fn(),
+  const roomProps = {
+    screens: [],
+    handleAddBoundaryBox: jest.fn(),
     handleRemoveBoundaryBox: jest.fn(),
     isControlPanelOpen: false,
-    setIsControlPanelOpen: jest.fn()};
+    setIsControlPanelOpen: jest.fn()
+  };
 
   const renderer = await ReactThreeTestRenderer.create(
     <SocketContext.Provider value={socket} >
@@ -50,10 +53,13 @@ test('renders non-null room when server sends room state', async () => {
 });
 
 test('opens control panel when within clickable distance', async () => {
-  const roomProps = {handleAddBoundaryBox: jest.fn(),
-      handleRemoveBoundaryBox: jest.fn(),
-      isControlPanelOpen: false,
-      setIsControlPanelOpen: jest.fn()};
+  const roomProps = {
+    screens: [],
+    handleAddBoundaryBox: jest.fn(),
+    handleRemoveBoundaryBox: jest.fn(),
+    isControlPanelOpen: false,
+    setIsControlPanelOpen: jest.fn()
+  };
 
   const renderer = await ReactThreeTestRenderer.create(
     <SocketContext.Provider value={socket} >
@@ -91,10 +97,13 @@ test('opens control panel when within clickable distance', async () => {
 
 test('keeps control panel closed when outside clickable distance',
     async () => {
-  const roomProps = {handleAddBoundaryBox: jest.fn(),
-      handleRemoveBoundaryBox: jest.fn(),
-      isControlPanelOpen: false,
-      setIsControlPanelOpen: jest.fn()};
+  const roomProps = {
+    screens: [],
+    handleAddBoundaryBox: jest.fn(),
+    handleRemoveBoundaryBox: jest.fn(),
+    isControlPanelOpen: false,
+    setIsControlPanelOpen: jest.fn()
+  };
 
   const renderer = await ReactThreeTestRenderer.create(
     <SocketContext.Provider value={socket} >
@@ -132,10 +141,13 @@ test('keeps control panel closed when outside clickable distance',
 
 test('opens control panel when exceeds clickable distance with y dimension, ' +
     'but is within when ignored', async () => {
-  const roomProps = {handleAddBoundaryBox: jest.fn(),
-      handleRemoveBoundaryBox: jest.fn(),
-      isControlPanelOpen: false,
-      setIsControlPanelOpen: jest.fn()};
+  const roomProps = {
+    screens: [],
+    handleAddBoundaryBox: jest.fn(),
+    handleRemoveBoundaryBox: jest.fn(),
+    isControlPanelOpen: false,
+    setIsControlPanelOpen: jest.fn()
+  };
 
   const renderer = await ReactThreeTestRenderer.create(
     <SocketContext.Provider value={socket} >

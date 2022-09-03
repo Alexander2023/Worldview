@@ -1,5 +1,6 @@
 import './ControlPanel.css';
 import { CreateScreenPage } from './CreateScreenPage';
+import { ScreenConfig, HandleScreenConfig } from './types';
 
 const OPENED_BOTTOM_POS = '0vh';
 const CLOSED_BOTTOM_POS = 'calc(36px - 44vh)';
@@ -7,12 +8,18 @@ const CLOSED_BOTTOM_POS = 'calc(36px - 44vh)';
 interface ControlPanelProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isPlacingScreen: boolean;
+  setScreenConfig: React.Dispatch<React.SetStateAction<ScreenConfig | null>>;
+  handleScreenConfig: HandleScreenConfig;
 }
 
 /**
  * Generates a panel for controlling in-world objects and interactions
  */
-function ControlPanel({isOpen, setIsOpen}: ControlPanelProps) {
+function ControlPanel(props: ControlPanelProps) {
+  const {isOpen, setIsOpen, isPlacingScreen, setScreenConfig,
+      handleScreenConfig} = props;
+
   const handleSliderClick = () => {
     setIsOpen(prevIsOpen => !prevIsOpen);
   };
@@ -26,7 +33,12 @@ function ControlPanel({isOpen, setIsOpen}: ControlPanelProps) {
           <div id="control-panel-slider-button" />
       </div>
       <div id="control-panel-content" >
-        <CreateScreenPage setIsControlPanelOpen={setIsOpen} />
+        <CreateScreenPage
+          setIsControlPanelOpen={setIsOpen}
+          isPlacingScreen={isPlacingScreen}
+          setScreenConfig={setScreenConfig}
+          handleScreenConfig={handleScreenConfig}
+        />
       </div>
     </div>
   )

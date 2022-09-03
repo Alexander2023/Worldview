@@ -1,11 +1,15 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
-import { Raycaster, Vector2 } from "three";
-import { useEventListener } from 'usehooks-ts'
+import { Euler, Matrix4, Quaternion, Raycaster, Vector2, Vector3 } from "three";
+import { useEventListener } from 'usehooks-ts';
 
 import { CLICKABLE_OBJECT_NAMES, MAX_CLICKABLE_DIST } from "./constants";
+import { HandleChosenScreenPlacement } from "./types";
 
-const computePointer = (event: PointerEvent) => {
+// Used to reduce a normalized vector to length of 0.1
+const NORMALIZED_VECTOR_DIVIDER = 10;
+
+const computePointer = (event: PointerEvent | MouseEvent) => {
   const pointer = new Vector2();
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -18,22 +22,19 @@ const computePointer = (event: PointerEvent) => {
  *
  * @param isCameraMoving true if camera state is changing, false otherwise
  */
-function usePointerEffect(isCameraMoving: boolean) {
+function usePointerEffect(isCameraMoving: boolean, isPlacingScreen: boolean,
+    handleChosenScreenPlacement: HandleChosenScreenPlacement) {
   const canvasRef = useRef(document.getElementById('three-canvas'));
+
   const [pointer, setPointer] = useState<Vector2 | null>(null);
   const [raycaster] = useState(new Raycaster());
   const {camera, scene} = useThree();
 
-  const shouldUseClickableStyle = () => {
-    if (!pointer) {
-      return false;
-    }
-
+  const getClickableIntersection = (pointer: Vector2) => {
     raycaster.setFromCamera(pointer, camera);
     const intersections = raycaster.intersectObjects(scene.children);
-
     if (intersections.length === 0) {
-      return false;
+      return null;
     }
 
     const intersection = intersections[0];
@@ -41,12 +42,16 @@ function usePointerEffect(isCameraMoving: boolean) {
     const xzDestination = new Vector2(intersection.point.x,
         intersection.point.z);
 
-    return CLICKABLE_OBJECT_NAMES.includes(intersection.object.name) &&
-        xzOrigin.distanceTo(xzDestination) <= MAX_CLICKABLE_DIST;
+    if (CLICKABLE_OBJECT_NAMES.includes(intersection.object.name) &&
+        xzOrigin.distanceTo(xzDestination) <= MAX_CLICKABLE_DIST) {
+      return intersection;
+    }
+
+    return null;
   };
 
-  const updateCursorStyle = () => {
-    if (shouldUseClickableStyle()) {
+  const updateCursorStyle = (pointer: Vector2) => {
+    if (getClickableIntersection(pointer)) {
       document.body.style.cursor = 'pointer';
     } else {
       document.body.style.cursor = 'auto';
@@ -54,8 +59,8 @@ function usePointerEffect(isCameraMoving: boolean) {
   };
 
   useFrame(() => {
-    if (isCameraMoving) {
-      updateCursorStyle();
+    if (pointer && isCameraMoving) {
+      updateCursorStyle(pointer);
     }
   });
 
@@ -64,12 +69,43 @@ function usePointerEffect(isCameraMoving: boolean) {
   };
 
   const handlePointerMove = (event: PointerEvent) => {
-    setPointer(computePointer(event));
-    updateCursorStyle();
+    const pointer = computePointer(event);
+    setPointer(pointer);
+    updateCursorStyle(pointer);
+  };
+
+  const handleClick = (event: MouseEvent) => {
+    if (!isPlacingScreen) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    const pointer = computePointer(event);
+    setPointer(pointer);
+
+    const intersection = getClickableIntersection(pointer);
+    if (!intersection || !intersection.face) {
+      return;
+    }
+
+    const worldDirection = intersection.face.normal.clone().transformDirection(
+        intersection.object.matrixWorld);
+    const offset = worldDirection.normalize().divideScalar(
+        NORMALIZED_VECTOR_DIVIDER);
+    const offsetPosition = intersection.point.clone().add(offset);
+
+    const rotationMatrix = new Matrix4().lookAt(worldDirection,
+        new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+    const quaternion = new Quaternion().setFromRotationMatrix(rotationMatrix);
+    const euler = new Euler().setFromQuaternion(quaternion.normalize(), 'YZX');
+
+    handleChosenScreenPlacement(offsetPosition, euler.y);
   };
 
   useEventListener('pointerover', handlePointerOver, canvasRef);
   useEventListener('pointermove', handlePointerMove, canvasRef);
+  useEventListener('click', handleClick, canvasRef, true);
 };
 
 export { usePointerEffect };

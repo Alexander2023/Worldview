@@ -42,7 +42,11 @@ afterEach(() => {
 
 test('moves forward when up arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
-    <User boundaryBoxes={boundaryBoxes} />
+    <User
+      boundaryBoxes={boundaryBoxes}
+      isPlacingScreen={false}
+      handleChosenScreenPlacement={jest.fn()}
+    />
   );
 
   const oldZPos = renderer.scene.children[0].instance.position.z;
@@ -59,7 +63,11 @@ test('moves forward when up arrow pressed', async () => {
 
 test('moves backward when down arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
-    <User boundaryBoxes={boundaryBoxes} />
+    <User
+      boundaryBoxes={boundaryBoxes}
+      isPlacingScreen={false}
+      handleChosenScreenPlacement={jest.fn()}
+    />
   );
 
   const oldZPos = renderer.scene.children[0].instance.position.z;
@@ -76,7 +84,11 @@ test('moves backward when down arrow pressed', async () => {
 
 test('moves counterclockwise when left arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
-    <User boundaryBoxes={boundaryBoxes} />
+    <User
+      boundaryBoxes={boundaryBoxes}
+      isPlacingScreen={false}
+      handleChosenScreenPlacement={jest.fn()}
+    />
   );
 
   const oldYRot = renderer.scene.children[0].instance.rotation.y;
@@ -93,7 +105,11 @@ test('moves counterclockwise when left arrow pressed', async () => {
 
 test('moves clockwise when right arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
-    <User boundaryBoxes={boundaryBoxes} />
+    <User
+      boundaryBoxes={boundaryBoxes}
+      isPlacingScreen={false}
+      handleChosenScreenPlacement={jest.fn()}
+    />
   );
 
   const oldYRot = renderer.scene.children[0].instance.rotation.y;
@@ -116,7 +132,11 @@ test('stops when colliding with an object', async () => {
   boundaryBoxes.set(0, boundaryBox);
 
   const renderer = await ReactThreeTestRenderer.create(
-    <User boundaryBoxes={boundaryBoxes} />
+    <User
+      boundaryBoxes={boundaryBoxes}
+      isPlacingScreen={false}
+      handleChosenScreenPlacement={jest.fn()}
+    />
   );
 
   await dispatchKeyboardEvent('keydown', 'ArrowUp');
