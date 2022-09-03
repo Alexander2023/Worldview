@@ -55,12 +55,9 @@ function World() {
       const image = new Image();
 
       image.onload = () => {
-        const dimensions = computeWorldDimensions(image.width, image.height);
-
         setScreenConfig({
           file: file,
-          width: dimensions[0],
-          height: dimensions[1]
+          dimensions: computeWorldDimensions(image.width, image.height)
         });
       };
 
@@ -86,7 +83,7 @@ function World() {
         // readAsDataURL returns a string for result property
         setScreens(prevScreens => [...prevScreens, {
           dataUrl: fileReader.result,
-          dimensions: [screenConfig.width, screenConfig.height],
+          dimensions: screenConfig.dimensions,
           position: position.toArray(),
           yRotation: yRotation
         }]);

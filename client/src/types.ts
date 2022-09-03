@@ -9,8 +9,7 @@ type HandleScreenConfig = (image: File) => void;
 
 interface ScreenConfig {
   file: File;
-  width: number;
-  height: number;
+  dimensions: number[];
 }
 
 export type { HandleAddBoundaryBox, HandleRemoveBoundaryBox, HandleChosenScreenPlacement, HandleScreenConfig, ScreenConfig };
