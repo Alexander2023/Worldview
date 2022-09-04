@@ -28,15 +28,15 @@ const computePointer = (event: PointerEvent | MouseEvent) => {
 function usePointerEffect(isCameraMoving: boolean, isPlacingScreen: boolean,
     handleChosenScreenPlacement: HandleChosenScreenPlacement) {
   const canvasRef = useRef(document.getElementById('three-canvas'));
+  const raycasterRef = useRef(new Raycaster());
 
   const [initialPointer, setInitialPointer] = useState<Vector2 | null>(null);
   const [hasPointerMoved, setHasPointerMoved] = useState(false);
-  const [raycaster] = useState(new Raycaster());
   const {camera, scene} = useThree();
 
   const getClickableIntersection = (pointer: Vector2) => {
-    raycaster.setFromCamera(pointer, camera);
-    const intersections = raycaster.intersectObjects(scene.children);
+    raycasterRef.current.setFromCamera(pointer, camera);
+    const intersections = raycasterRef.current.intersectObjects(scene.children);
     if (intersections.length === 0) {
       return null;
     }
