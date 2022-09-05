@@ -9,7 +9,8 @@ const MAX_CLICKABLE_DIST = 20;
  */
 const EFFECTS_OBJECT_NAMES = {
   WALL: 'wall',
-  PANEL: 'panel'
+  PANEL: 'panel',
+  PLACEMENT_MARKER: 'placement-marker'
 }
 
 /**

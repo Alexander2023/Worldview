@@ -131,7 +131,7 @@ function World() {
         />
         <User
           boundaryBoxes={boundaryBoxes}
-          isPlacingScreen={screenConfig !== null}
+          screenDimensions={screenConfig ? screenConfig.dimensions : null}
           handleChosenScreenPlacement={handleChosenScreenPlacement}
         />
         {avatars.map(([id, avatar]) => (

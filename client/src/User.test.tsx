@@ -1,5 +1,6 @@
 import ReactThreeTestRenderer from '@react-three/test-renderer'
 import * as THREE from 'three';
+
 import { User } from './User';
 
 // since there is no React Three Fiber canvas while testing, we can
@@ -44,7 +45,7 @@ test('moves forward when up arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
     <User
       boundaryBoxes={boundaryBoxes}
-      isPlacingScreen={false}
+      screenDimensions={null}
       handleChosenScreenPlacement={jest.fn()}
     />
   );
@@ -65,7 +66,7 @@ test('moves backward when down arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
     <User
       boundaryBoxes={boundaryBoxes}
-      isPlacingScreen={false}
+      screenDimensions={null}
       handleChosenScreenPlacement={jest.fn()}
     />
   );
@@ -86,7 +87,7 @@ test('moves counterclockwise when left arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
     <User
       boundaryBoxes={boundaryBoxes}
-      isPlacingScreen={false}
+      screenDimensions={null}
       handleChosenScreenPlacement={jest.fn()}
     />
   );
@@ -107,7 +108,7 @@ test('moves clockwise when right arrow pressed', async () => {
   const renderer = await ReactThreeTestRenderer.create(
     <User
       boundaryBoxes={boundaryBoxes}
-      isPlacingScreen={false}
+      screenDimensions={null}
       handleChosenScreenPlacement={jest.fn()}
     />
   );
@@ -134,7 +135,7 @@ test('stops when colliding with an object', async () => {
   const renderer = await ReactThreeTestRenderer.create(
     <User
       boundaryBoxes={boundaryBoxes}
-      isPlacingScreen={false}
+      screenDimensions={null}
       handleChosenScreenPlacement={jest.fn()}
     />
   );

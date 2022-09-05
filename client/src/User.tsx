@@ -5,7 +5,7 @@ import { Box3, Vector3 } from "three";
 import { CUBE_SIZE } from "./Avatar";
 import { SocketContext } from "./context/socket";
 import { HandleChosenScreenPlacement } from "./types";
-import { usePointerEffect } from "./usePointerEffect";
+import { PointerEffects } from "./PointerEffects";
 
 const MOVEMENT_SPEED = 20;
 const ROTATIONAL_SPEED = Math.PI / 2;
@@ -14,7 +14,7 @@ const CUBE_DIAGONAL = Math.sqrt(2) * CUBE_SIZE;
 
 interface UserProps {
   boundaryBoxes: Map<number, THREE.Box3>;
-  isPlacingScreen: boolean;
+  screenDimensions: number[] | null;
   handleChosenScreenPlacement: HandleChosenScreenPlacement;
 }
 
@@ -22,15 +22,12 @@ interface UserProps {
  * Generates a client-controlled first person perspective of the world
  */
 function User(props: UserProps) {
-  const {boundaryBoxes, isPlacingScreen, handleChosenScreenPlacement} = props;
+  const {boundaryBoxes, screenDimensions, handleChosenScreenPlacement} = props;
 
   const socket = useContext(SocketContext);
 
   const [moveFactor, setMoveFactor] = useState(0);
   const [rotateFactor, setRotateFactor] = useState(0);
-
-  usePointerEffect(moveFactor !== 0 || rotateFactor !== 0, isPlacingScreen,
-      handleChosenScreenPlacement);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -100,7 +97,16 @@ function User(props: UserProps) {
         yRotation: state.camera.rotation.y});
   });
 
-  return <PerspectiveCamera makeDefault position-y={DEFAULT_HEIGHT} />;
+  return (
+    <>
+      <PerspectiveCamera makeDefault position-y={DEFAULT_HEIGHT} />
+      <PointerEffects
+        isCameraMoving={moveFactor !== 0 || rotateFactor !== 0}
+        screenDimensions={screenDimensions}
+        handleChosenScreenPlacement={handleChosenScreenPlacement}
+      />
+    </>
+  );
 }
 
 export { User };
