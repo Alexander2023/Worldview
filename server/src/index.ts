@@ -1,12 +1,13 @@
 import http from 'http';
 import { Server, Socket } from 'socket.io';
 import roomState from './room-state.json';
-import { Avatar, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { Avatar, Screen, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
 
 const server = http.createServer();
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(
-    server, {cors: {origin: '*'}});
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
+  cors: {origin: '*'},
+  maxHttpBufferSize: 5e6 // 5 MB
+});
 
 const TICK_RATE = 60;
 const sockets = new Set<Socket<ClientToServerEvents, ServerToClientEvents>>();
@@ -16,6 +17,7 @@ io.on('connection', socket => {
   console.log(`User Connected: ${socket.id}`);
 
   socket.on('joinRoom', () => onJoinRoom(socket));
+  socket.on('sendScreen', (screen) => onSendScreen(socket, screen));
   socket.on('sendInput', (avatar) => onSendInput(socket, avatar));
   socket.on('disconnect', () => onDisconnect(socket));
 
@@ -28,6 +30,11 @@ const onJoinRoom = (socket: Socket<ClientToServerEvents,
   avatars.set(socket.id, {position: [0, 0, 0], yRotation: 0});
   socket.emit('receiveRoom', roomState);
 };
+
+const onSendScreen = (socket: Socket<ClientToServerEvents,
+    ServerToClientEvents>, screen: Screen) => {
+  socket.broadcast.emit('receiveScreen', screen);
+}
 
 const onSendInput = (socket: Socket<ClientToServerEvents, ServerToClientEvents>,
     avatar: Avatar) => {

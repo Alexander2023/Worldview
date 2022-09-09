@@ -28,11 +28,13 @@ interface Screen {
 
 interface ServerToClientEvents {
   receiveRoom: (roomState: RoomState) => void;
+  receiveScreen: (screen: Screen) => void;
   update: (avatars: [string, Avatar][]) => void;
 }
 
 interface ClientToServerEvents {
   joinRoom: () => void;
+  sendScreen: (screen: Screen) => void;
   sendInput: (avatar: Avatar) => void;
 }
 
