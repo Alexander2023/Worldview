@@ -10,6 +10,7 @@ import { ControlPanel } from './ControlPanel';
 import { Room } from './Room';
 import { ScreenConfig } from './types';
 import { User } from './User';
+import { useWebRTC } from './useWebRTC';
 
 const computeWorldDimensions = (imageWidth: number, imageHeight: number) => {
   const SCREEN_SCALE_FACTOR = 5;
@@ -24,6 +25,8 @@ const computeWorldDimensions = (imageWidth: number, imageHeight: number) => {
  */
 function World() {
   const socket = useContext(SocketContext);
+
+  useWebRTC();
 
   const [boundaryBoxes, setBoundaryBoxes] = useState(new Map<number, Box3>());
   const [avatars, setAvatars] = useState<[string, AvatarType][]>([]);
