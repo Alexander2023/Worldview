@@ -1,13 +1,13 @@
 import http from 'http';
 import { Server, Socket } from 'socket.io';
 import * as mediasoup from 'mediasoup';
-import { WebRtcTransport, Producer } from "mediasoup/node/lib/types";
+import { WebRtcTransport, Producer, Consumer } from "mediasoup/node/lib/types";
 
 import { Avatar, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
 import { routerConfig, socketServerConfig, webRtcServerConfig } from './config';
 import { userHandler } from './userHandler';
 import { mediasoupHandler } from './mediasoupHandler';
-import { MediasoupState } from './types';
+import { MediasoupIds, MediasoupState } from './types';
 import roomState from './room-state.json';
 
 const TICK_RATE = 60;
@@ -22,8 +22,9 @@ const initMediasoupState = async (): Promise<MediasoupState> => {
     webRtcServer: webRtcServer,
     router: router,
     producerTransports: new Map<string, WebRtcTransport>(),
-    clientProducerTransportId: new Map<string, string>(),
-    clientProducers: new Map<string, Producer[]>()
+    consumerTransports: new Map<string, WebRtcTransport>(),
+    consumers: new Map<string, Consumer>(),
+    producers: new Map<string, Producer>()
   }
 }
 
@@ -39,50 +40,94 @@ const main = async () => {
     const avatars = new Map<string, Avatar>();
 
     const mediasoupState = await initMediasoupState();
+    const socketIdToMediasoupIds = new Map<string, MediasoupIds>();
 
-    const { handleJoinRoom, handleSendInput, handleSendScreen } =
+    const {handleJoinRoom, handleSendInput, handleSendScreen} =
         userHandler(sockets, avatars);
 
-    const { handleCreateTransport, handleTransportConnect,
-        handleTransportProduce } = mediasoupHandler(mediasoupState);
+    const {handleGetTransportOptions, handleTransportConnect,
+        handleTransportProduce, handleTransportConsume, handleResumeConsumer} =
+            mediasoupHandler(sockets, mediasoupState, socketIdToMediasoupIds);
 
-    io.on('connection', socket => {
+    io.on('connection', async socket => {
       console.log(`User Connected: ${socket.id}`);
+
+      const producerTransport =
+          await mediasoupState.router.createWebRtcTransport({
+              webRtcServer: mediasoupState.webRtcServer});
+      const consumerTransport =
+          await mediasoupState.router.createWebRtcTransport({
+              webRtcServer: mediasoupState.webRtcServer});
+
+      mediasoupState.producerTransports.set(producerTransport.id,
+          producerTransport);
+      mediasoupState.consumerTransports.set(consumerTransport.id,
+          consumerTransport);
+
+      const mediasoupIds: MediasoupIds = {
+        producerTransportId: producerTransport.id,
+        consumerTransportId: consumerTransport.id,
+        producerIds: [],
+        consumerIds: []
+      }
+
+      socketIdToMediasoupIds.set(socket.id, mediasoupIds);
 
       socket.on('getRtpCapabilities', (callback) =>
           callback(mediasoupState.router.rtpCapabilities));
-      socket.on('createTransport', (callback) =>
-          handleCreateTransport(socket.id, callback));
+      socket.on('getTransportOptions', (...event) =>
+          handleGetTransportOptions(mediasoupIds, ...event));
       socket.on('transportConnect', handleTransportConnect);
       socket.on('transportProduce', (...event) =>
-          handleTransportProduce(socket.id, ...event));
+          handleTransportProduce(mediasoupIds, ...event));
+      socket.on('transportConsume', (...event) =>
+          handleTransportConsume(socket, mediasoupIds, ...event));
+      socket.on('resumeConsumer', handleResumeConsumer);
 
       socket.on('joinRoom', () => handleJoinRoom(socket, roomState));
       socket.on('sendScreen', (screen) => handleSendScreen(socket, screen));
       socket.on('sendInput', (avatar) => handleSendInput(socket, avatar));
 
-      socket.on('disconnect', () => handleDisconnect(socket));
+      socket.on('disconnect', () => handleDisconnect(socket, mediasoupIds));
 
       setInterval(update, 1000 / TICK_RATE);
     });
 
 
     const handleDisconnect = (socket: Socket<ClientToServerEvents,
-        ServerToClientEvents>) => {
+        ServerToClientEvents>, mediasoupIds: MediasoupIds) => {
+      const {producerTransports, consumerTransports, producers, consumers} =
+          mediasoupState;
       console.log(`User Disconnected: ${socket.id}`);
 
       sockets.delete(socket);
       avatars.delete(socket.id);
-      mediasoupState.clientProducers.delete(socket.id);
 
-      const producerTransportId =
-          mediasoupState.clientProducerTransportId.get(socket.id);
-      if (producerTransportId &&
-          mediasoupState.producerTransports.has(producerTransportId)) {
-        mediasoupState.producerTransports.delete(producerTransportId);
+      if (producerTransports.has(mediasoupIds.producerTransportId)) {
+        producerTransports.get(mediasoupIds.producerTransportId)!.close();
+        producerTransports.delete(mediasoupIds.producerTransportId);
       }
 
-      mediasoupState.clientProducerTransportId.delete(socket.id);
+      if (consumerTransports.has(mediasoupIds.consumerTransportId)) {
+        consumerTransports.get(mediasoupIds.consumerTransportId)!.close();
+        consumerTransports.delete(mediasoupIds.consumerTransportId);
+      }
+
+      for (const producerId of mediasoupIds.producerIds) {
+        if (producers.has(producerId)) {
+          producers.get(producerId)!.close();
+          producers.delete(producerId);
+        }
+      }
+
+      for (const consumerId of mediasoupIds.consumerIds) {
+        if (consumers.has(consumerId)) {
+          consumers.get(consumerId)!.close();
+          consumers.delete(consumerId);
+        }
+      }
+
+      socketIdToMediasoupIds.delete(socket.id);
     };
 
     const update = () => {

@@ -1,85 +1,182 @@
-import { DtlsParameters, MediaKind, RtpParameters, RtpCapabilities, Router, WebRtcServer, WebRtcTransport, Producer } from "mediasoup/node/lib/types";
+import { DtlsParameters, MediaKind, RtpParameters, RtpCapabilities, WebRtcTransport } from "mediasoup/node/lib/types";
+import { Socket } from "socket.io";
 
-import { TransportOptions } from '../../shared/types';
-import { MediasoupState } from "./types";
+import { ClientToServerEvents, ConsumerOptions, ServerToClientEvents, TransportOptions } from '../../shared/types';
+import { MediasoupIds, MediasoupState } from "./types";
 
 /**
  * Wrapper handler for mediasoup-related event handlers
  *
+ * @param sockets set of active sockets
  * @param mediasoupState state of the server-side mediasoup session
+ * @param socketIdToMediasoupIds mediasoupState ids of active sockets
  * @returns mediasoup-related event handlers
  */
-const mediasoupHandler = (mediasoupState: MediasoupState) => {
-  const { router, webRtcServer, producerTransports, clientProducerTransportId,
-      clientProducers } = mediasoupState;
+const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
+    ServerToClientEvents>>, mediasoupState: MediasoupState,
+    socketIdToMediasoupIds: Map<string, MediasoupIds>) => {
+  const {router, producerTransports, consumerTransports, producers,
+      consumers} = mediasoupState;
 
-  const handleCreateTransport = async (socketId: string,
-      callback: (transportOptions: TransportOptions) => void) => {
-    try {
-      const producerTransport =
-          await router.createWebRtcTransport({webRtcServer: webRtcServer});
+  const handleGetTransportOptions = async (mediasoupIds: MediasoupIds,
+      isProducer: boolean, callback: (transportOptions: TransportOptions)
+          => void) => {
+    let transport: WebRtcTransport | undefined;
 
-      const producerTransportOptions = {
-        id: producerTransport.id,
-        iceParameters: producerTransport.iceParameters,
-        iceCandidates: producerTransport.iceCandidates,
-        dtlsParameters: producerTransport.dtlsParameters
-      }
-
-      callback(producerTransportOptions);
-
-      producerTransports.set(producerTransport.id, producerTransport);
-      clientProducerTransportId.set(socketId, producerTransport.id);
-    } catch (error) {
-      console.log(error);
+    if (isProducer) {
+      transport = producerTransports.get(mediasoupIds.producerTransportId);
+    } else {
+      transport = consumerTransports.get(mediasoupIds.consumerTransportId);
     }
+
+    if (!transport) {
+      return;
+    }
+
+    const transportOptions = {
+      id: transport.id,
+      iceParameters: transport.iceParameters,
+      iceCandidates: transport.iceCandidates,
+      dtlsParameters: transport.dtlsParameters
+    }
+
+    callback(transportOptions);
   };
 
-  const handleTransportConnect = async (transportId: string,
-      dtlsParameters: DtlsParameters, callback: () => void) => {
-    const producerTransport = producerTransports.get(transportId);
-    if (!producerTransport) {
+  const handleTransportConnect = async (isProducer: boolean,
+      transportId: string, dtlsParameters: DtlsParameters,
+      callback: () => void) => {
+    let transport: WebRtcTransport | undefined;
+
+    if (isProducer) {
+      transport = producerTransports.get(transportId);
+    } else {
+      transport = consumerTransports.get(transportId);
+    }
+
+    if (!transport) {
       return;
     }
 
     try {
-      await producerTransport.connect({dtlsParameters});
+      await transport.connect({dtlsParameters});
       callback();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleTransportProduce = async (socketId: string, transportId: string,
-      kind: MediaKind, rtpParameters: RtpParameters,
+  const handleTransportProduce = async (mediasoupIds: MediasoupIds,
+      transportId: string, kind: MediaKind, rtpParameters: RtpParameters,
       callback: (id: string) => void) => {
-    const producerTransport = producerTransports.get(transportId);
-    if (!producerTransport) {
+    if (!producerTransports.has(transportId)) {
       return;
     }
 
     try {
-      const producer = await producerTransport.produce({
+      const producer = await producerTransports.get(transportId)!.produce({
         kind: kind,
         rtpParameters: rtpParameters
       });
 
-      callback(producer.id);
+      producers.set(producer.id, producer);
+      mediasoupIds.producerIds.push(producer.id);
 
-      if (!clientProducers.has(socketId)) {
-        clientProducers.set(socketId, []);
+      callback(producer.id);
+      alertConsumers();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const alertConsumers = () => {
+    for (const socket of sockets) {
+      if (!socketIdToMediasoupIds.has(socket.id)) {
+        continue;
       }
 
-      clientProducers.get(socketId)!.push(producer);
+      const mediasoupIds = socketIdToMediasoupIds.get(socket.id)!;
+      const producerIds: string[] = [];
+
+      for (const producerId of producers.keys()) {
+        if (!mediasoupIds.producerIds.includes(producerId)) {
+          producerIds.push(producerId);
+        }
+      }
+
+      socket.emit('updatedProducerIds', producerIds);
+    }
+  };
+
+  const handleTransportConsume = async (socket: Socket<ClientToServerEvents,
+      ServerToClientEvents>, mediasoupIds: MediasoupIds, producerId: string,
+      rtpCapabilities: RtpCapabilities,
+      callback: (consumerOptions: ConsumerOptions) => void) => {
+    if (!consumerTransports.has(mediasoupIds.consumerTransportId) ||
+        !router.canConsume({producerId, rtpCapabilities})) {
+      return;
+    }
+
+    const consumerTransport =
+        consumerTransports.get(mediasoupIds.consumerTransportId)!;
+
+    try {
+      const consumer = await consumerTransport.consume({
+        producerId: producerId,
+        rtpCapabilities: rtpCapabilities,
+        paused: true
+      });
+
+      consumer.on('producerclose', () =>
+          handleProducerClose(socket, mediasoupIds, producerId, consumer.id));
+
+      consumers.set(consumer.id, consumer);
+      mediasoupIds.consumerIds.push(consumer.id);
+
+      const consumerOptions = {
+        id: consumer.id,
+        producerId: producerId,
+        kind: consumer.kind,
+        rtpParameters: consumer.rtpParameters
+      }
+
+      callback(consumerOptions);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleProducerClose = (socket: Socket<ClientToServerEvents,
+      ServerToClientEvents>, mediasoupIds: MediasoupIds, producerId: string,
+      consumerId: string) => {
+    socket.emit('producerClose', producerId);
+
+    consumers.delete(consumerId);
+
+    const idx = mediasoupIds.consumerIds.indexOf(consumerId);
+    if (idx > -1) {
+      mediasoupIds.consumerIds.splice(idx, 1);
+    }
+  };
+
+  const handleResumeConsumer = async (consumerId: string) => {
+    if (!consumers.has(consumerId)) {
+      return;
+    }
+
+    try {
+      await consumers.get(consumerId)!.resume();
     } catch (error) {
       console.log(error);
     }
   };
 
   return {
-    handleCreateTransport,
+    handleGetTransportOptions,
     handleTransportConnect,
-    handleTransportProduce
+    handleTransportProduce,
+    handleTransportConsume,
+    handleResumeConsumer
   }
 };
 

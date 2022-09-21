@@ -35,7 +35,16 @@ interface TransportOptions {
   dtlsParameters: DtlsParameters
 }
 
+interface ConsumerOptions {
+  id: string;
+  producerId: string;
+  kind: MediaKind;
+  rtpParameters: RtpParameters;
+}
+
 interface ServerToClientEvents {
+  updatedProducerIds: (producerIds: string[]) => void;
+  producerClose: (producerId: string) => void;
   receiveRoom: (roomState: RoomState) => void;
   receiveScreen: (screen: Screen) => void;
   update: (avatars: [string, Avatar][]) => void;
@@ -44,15 +53,18 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
   getRtpCapabilities:
       (callback: (capabilities: RtpCapabilities) => void) => void;
-  createTransport:
-      (callback: (transportOptions: TransportOptions) => void) => void;
-  transportConnect: (transportId: string, dtlsParameters: DtlsParameters,
-      callback: () => void) => void;
+  getTransportOptions: (isProducer: boolean,
+      callback: (transportOptions: TransportOptions) => void) => void;
+  transportConnect: (isProducer: boolean, transportId: string,
+      dtlsParameters: DtlsParameters, callback: () => void) => void;
   transportProduce: (transportId: string, kind: MediaKind,
       rtpParameters: RtpParameters, callback: (id: string) => void) => void;
+  transportConsume: (producerId: string, rtpCapabilities: RtpCapabilities,
+      callback: (consumerOptions: ConsumerOptions) => void) => void;
+  resumeConsumer: (consumerId: string) => void;
   joinRoom: () => void;
   sendScreen: (screen: Screen) => void;
   sendInput: (avatar: Avatar) => void;
 }
 
-export { Panel, RoomState, Avatar, Screen, ServerToClientEvents, ClientToServerEvents, TransportOptions };
+export { Panel, RoomState, Avatar, Screen, ServerToClientEvents, ClientToServerEvents, TransportOptions, ConsumerOptions };
