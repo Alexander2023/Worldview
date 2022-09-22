@@ -66,9 +66,9 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
     }
   };
 
-  const handleTransportProduce = async (mediasoupIds: MediasoupIds,
-      transportId: string, kind: MediaKind, rtpParameters: RtpParameters,
-      callback: (id: string) => void) => {
+  const handleTransportProduce = async (socketId: string,
+      mediasoupIds: MediasoupIds, transportId: string, kind: MediaKind,
+      rtpParameters: RtpParameters, callback: (id: string) => void) => {
     if (!producerTransports.has(transportId)) {
       return;
     }
@@ -76,7 +76,8 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
     try {
       const producer = await producerTransports.get(transportId)!.produce({
         kind: kind,
-        rtpParameters: rtpParameters
+        rtpParameters: rtpParameters,
+        appData: {socketId: socketId}
       });
 
       producers.set(producer.id, producer);
@@ -112,10 +113,16 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
       ServerToClientEvents>, mediasoupIds: MediasoupIds, producerId: string,
       rtpCapabilities: RtpCapabilities,
       callback: (consumerOptions: ConsumerOptions) => void) => {
-    if (!consumerTransports.has(mediasoupIds.consumerTransportId) ||
+    const producer = producers.get(producerId);
+
+    if (!producer?.appData.socketId ||
+        typeof producer.appData.socketId !== 'string' ||
+        !consumerTransports.has(mediasoupIds.consumerTransportId) ||
         !router.canConsume({producerId, rtpCapabilities})) {
       return;
     }
+
+    const producerSocketId = producer.appData.socketId as string;
 
     const consumerTransport =
         consumerTransports.get(mediasoupIds.consumerTransportId)!;
@@ -127,8 +134,8 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
         paused: true
       });
 
-      consumer.on('producerclose', () =>
-          handleProducerClose(socket, mediasoupIds, producerId, consumer.id));
+      consumer.on('producerclose', () => handleProducerClose(socket,
+          mediasoupIds, producerId, producerSocketId, consumer.id));
 
       consumers.set(consumer.id, consumer);
       mediasoupIds.consumerIds.push(consumer.id);
@@ -136,6 +143,7 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
       const consumerOptions = {
         id: consumer.id,
         producerId: producerId,
+        producerSocketId: producerSocketId,
         kind: consumer.kind,
         rtpParameters: consumer.rtpParameters
       }
@@ -148,8 +156,8 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
 
   const handleProducerClose = (socket: Socket<ClientToServerEvents,
       ServerToClientEvents>, mediasoupIds: MediasoupIds, producerId: string,
-      consumerId: string) => {
-    socket.emit('producerClose', producerId);
+      producerSocketId: string, consumerId: string) => {
+    socket.emit('producerClose', producerId, producerSocketId);
 
     consumers.delete(consumerId);
 

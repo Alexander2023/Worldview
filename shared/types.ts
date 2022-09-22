@@ -38,13 +38,14 @@ interface TransportOptions {
 interface ConsumerOptions {
   id: string;
   producerId: string;
+  producerSocketId: string;
   kind: MediaKind;
   rtpParameters: RtpParameters;
 }
 
 interface ServerToClientEvents {
   updatedProducerIds: (producerIds: string[]) => void;
-  producerClose: (producerId: string) => void;
+  producerClose: (producerId: string, producerSocketId: string) => void;
   receiveRoom: (roomState: RoomState) => void;
   receiveScreen: (screen: Screen) => void;
   update: (avatars: [string, Avatar][]) => void;

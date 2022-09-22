@@ -122,6 +122,7 @@ describe('handleTransportConnect()', () => {
 describe('handleTransportProduce()', () => {
   test('calls the callback with the appropriate producer id', async () => {
     const producerId = '1';
+    const socketId = '2';
 
     const producer = createMockedProducerInstance(producerId);
     webRtcTransport.prototype.produce.mockResolvedValueOnce(producer);
@@ -139,8 +140,8 @@ describe('handleTransportProduce()', () => {
     const { handleTransportProduce } =
         mediasoupHandler(sockets, mediasoupState, socketIdToMediasoupIds);
 
-    await handleTransportProduce(mediasoupIds, WEB_RTC_TRANSPORT_ID, 'video',
-        {} as RtpParameters, callback);
+    await handleTransportProduce(socketId, mediasoupIds, WEB_RTC_TRANSPORT_ID,
+        'video', {} as RtpParameters, callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith(producerId);
@@ -148,6 +149,7 @@ describe('handleTransportProduce()', () => {
 
   test('updates the mediasoup state + ids with the new producer', async () => {
     const producerId = '1';
+    const socketId = '2';
 
     const producer = createMockedProducerInstance(producerId);
     webRtcTransport.prototype.produce.mockResolvedValueOnce(producer);
@@ -168,8 +170,8 @@ describe('handleTransportProduce()', () => {
     expect(mediasoupState.producers.size).toBe(0);
     expect(mediasoupIds.producerIds.length).toBe(0);
 
-    await handleTransportProduce(mediasoupIds, WEB_RTC_TRANSPORT_ID, 'video',
-        {} as RtpParameters, callback);
+    await handleTransportProduce(socketId, mediasoupIds, WEB_RTC_TRANSPORT_ID,
+        'video', {} as RtpParameters, callback);
 
     expect(mediasoupState.producers.size).toBe(1);
     expect(mediasoupIds.producerIds.length).toBe(1);
@@ -232,8 +234,8 @@ describe('handleTransportProduce()', () => {
     const { handleTransportProduce } =
         mediasoupHandler(sockets, mediasoupState, socketIdToMediasoupIds);
 
-    await handleTransportProduce(mediasoupIds, WEB_RTC_TRANSPORT_ID, 'video',
-        {} as RtpParameters, callback);
+    await handleTransportProduce(socketThreeId, mediasoupIds,
+        WEB_RTC_TRANSPORT_ID, 'video', {} as RtpParameters, callback);
 
     expect(socketOne.emit).toBeCalledTimes(1);
     expect(socketTwo.emit).toBeCalledTimes(1);
@@ -260,14 +262,18 @@ describe('handleTransportConsume()', () => {
   test('calls the callback with a consumer', async () => {
     const socketId = '1';
     const consumerId = '2';
+    const producerId = '3';
 
     const consumer = createMockedConsumerInstance(consumerId);
+    const producer = createMockedProducerInstance(producerId);
+    mockGetterProp(producer, 'appData', {socketId: socketId});
 
     router.prototype.canConsume.mockImplementationOnce(() => true);
 
     webRtcTransport.prototype.consume.mockResolvedValueOnce(consumer);
     mediasoupState.consumerTransports.set(WEB_RTC_TRANSPORT_ID,
         webRtcTransport.prototype);
+    mediasoupState.producers.set(producerId, producer);
 
     const mediasoupIds: MediasoupIds = {
       producerTransportId: '',
@@ -281,7 +287,7 @@ describe('handleTransportConsume()', () => {
         mediasoupHandler(sockets, mediasoupState, socketIdToMediasoupIds);
 
     await handleTransportConsume(createMockedSocketInstance(socketId),
-        mediasoupIds, WEB_RTC_TRANSPORT_ID, {} as RtpCapabilities, callback);
+        mediasoupIds, producerId, {} as RtpCapabilities, callback);
 
     expect(callback).toBeCalledTimes(1);
 
@@ -292,14 +298,18 @@ describe('handleTransportConsume()', () => {
   test('updates the mediasoup state + ids with the new consumer', async () => {
     const socketId = '1';
     const consumerId = '2';
+    const producerId = '3';
 
     const consumer = createMockedConsumerInstance(consumerId);
+    const producer = createMockedProducerInstance(producerId);
+    mockGetterProp(producer, 'appData', {socketId: socketId});
 
     router.prototype.canConsume.mockImplementationOnce(() => true);
 
     webRtcTransport.prototype.consume.mockResolvedValueOnce(consumer);
     mediasoupState.consumerTransports.set(WEB_RTC_TRANSPORT_ID,
         webRtcTransport.prototype);
+    mediasoupState.producers.set(producerId, producer);
 
     const mediasoupIds: MediasoupIds = {
       producerTransportId: '',
@@ -316,7 +326,7 @@ describe('handleTransportConsume()', () => {
     expect(mediasoupIds.consumerIds.length).toBe(0);
 
     await handleTransportConsume(createMockedSocketInstance(socketId),
-        mediasoupIds, WEB_RTC_TRANSPORT_ID, {} as RtpCapabilities, callback);
+        mediasoupIds, producerId, {} as RtpCapabilities, callback);
 
     expect(mediasoupState.consumers.size).toBe(1);
     expect(mediasoupIds.consumerIds.length).toBe(1);

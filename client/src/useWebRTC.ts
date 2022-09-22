@@ -16,15 +16,16 @@ function useWebRTC() {
   const device = useRef<Device | null>(null);
   const consumerTransport = useRef<Transport | null>(null);
   const consumedProducerIds = useRef(new Set<string>());
-  // Stores mappings from producerId to consumer
+  // Stores mappings from producer id to consumer
   const consumers = useRef(new Map<string, Consumer>());
 
   const [producerTransport, setProducerTransport] =
       useState<Transport | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  // Stores mappings from producerId to media stream
+  // Stores mappings from socket id to map of
+  // producer id to media stream entries
   const [remoteStreams, setRemoteStreams] =
-      useState(new Map<string, MediaStream>());
+      useState(new Map<string, Map<string, MediaStream>>());
 
   useEffect(() => {
     const rtpCapabilitiesCallback = async (capabilities: RtpCapabilities) => {
@@ -168,28 +169,38 @@ function useWebRTC() {
         return;
       }
 
+      const {id, producerId, producerSocketId, kind, rtpParameters} = options;
+
       try {
         const consumer = await consumerTransport.current.consume({
-          id: options.id,
-          producerId: options.producerId,
-          kind: options.kind,
-          rtpParameters: options.rtpParameters
+          id: id,
+          producerId: producerId,
+          kind: kind,
+          rtpParameters: rtpParameters
         });
 
-        consumers.current.set(options.producerId, consumer);
+        consumers.current.set(producerId, consumer);
 
-        socket.emit('resumeConsumer', options.id);
+        socket.emit('resumeConsumer', id);
 
         setRemoteStreams(prevRemoteStreams => {
-          return new Map([...prevRemoteStreams,
-              [options.producerId, new MediaStream([consumer.track])]]);
+          if (!prevRemoteStreams.has(producerSocketId)) {
+            prevRemoteStreams.set(producerSocketId,
+                new Map<string, MediaStream>());
+          }
+
+          prevRemoteStreams.get(producerSocketId)!.set(producerId,
+              new MediaStream([consumer.track]));
+
+          return new Map(prevRemoteStreams);
         });
       } catch (error) {
         console.log(error);
       }
     };
 
-    const handleProducerClose = (producerId: string) => {
+    const handleProducerClose = (producerId: string,
+        producerSocketId: string) => {
       consumedProducerIds.current.delete(producerId);
 
       if (consumers.current.has(producerId)) {
@@ -198,9 +209,16 @@ function useWebRTC() {
       }
 
       setRemoteStreams(prevRemoteStreams => {
-        const newRemoteStreams = new Map(prevRemoteStreams);
-        newRemoteStreams.delete(producerId);
-        return newRemoteStreams;
+        if (prevRemoteStreams.has(producerSocketId)) {
+          const producerIdToStream = prevRemoteStreams.get(producerSocketId)!;
+          producerIdToStream.delete(producerId);
+
+          if (producerIdToStream.size === 0) {
+            prevRemoteStreams.delete(producerSocketId);
+          }
+        }
+
+        return new Map(prevRemoteStreams);
       });
     };
 
@@ -213,7 +231,7 @@ function useWebRTC() {
     }
   }, [socket]);
 
-  return [localStream, Array.from(remoteStreams.values())];
+  return [localStream, remoteStreams];
 }
 
 export { useWebRTC };

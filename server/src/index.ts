@@ -79,7 +79,7 @@ const main = async () => {
           handleGetTransportOptions(mediasoupIds, ...event));
       socket.on('transportConnect', handleTransportConnect);
       socket.on('transportProduce', (...event) =>
-          handleTransportProduce(mediasoupIds, ...event));
+          handleTransportProduce(socket.id, mediasoupIds, ...event));
       socket.on('transportConsume', (...event) =>
           handleTransportConsume(socket, mediasoupIds, ...event));
       socket.on('resumeConsumer', handleResumeConsumer);
