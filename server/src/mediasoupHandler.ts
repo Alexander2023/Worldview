@@ -157,7 +157,7 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
   const handleProducerClose = (socket: Socket<ClientToServerEvents,
       ServerToClientEvents>, mediasoupIds: MediasoupIds, producerId: string,
       producerSocketId: string, consumerId: string) => {
-    socket.emit('producerClose', producerId, producerSocketId);
+    socket.emit('producerClose', consumerId, producerId, producerSocketId);
 
     consumers.delete(consumerId);
 

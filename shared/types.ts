@@ -45,7 +45,8 @@ interface ConsumerOptions {
 
 interface ServerToClientEvents {
   updatedProducerIds: (producerIds: string[]) => void;
-  producerClose: (producerId: string, producerSocketId: string) => void;
+  producerClose: (consumerId: string, producerId: string,
+      producerSocketId: string) => void;
   receiveRoom: (roomState: RoomState) => void;
   receiveScreen: (screen: Screen) => void;
   update: (avatars: [string, Avatar][]) => void;
