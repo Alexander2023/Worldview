@@ -136,6 +136,10 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
 
       consumer.on('producerclose', () => handleProducerClose(socket,
           mediasoupIds, producerId, producerSocketId, consumer.id));
+      consumer.on('producerpause', () =>
+          socket.emit('producerPause', consumer.id));
+      consumer.on('producerresume', () =>
+          socket.emit('producerResume', consumer.id));
 
       consumers.set(consumer.id, consumer);
       mediasoupIds.consumerIds.push(consumer.id);
@@ -167,13 +171,37 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
     }
   };
 
-  const handleResumeConsumer = async (consumerId: string) => {
-    if (!consumers.has(consumerId)) {
+  const findCarrier = (isProducer: boolean, serverCarrierId: string) => {
+    if (isProducer) {
+      return producers.get(serverCarrierId);
+    } else {
+      return consumers.get(serverCarrierId);
+    }
+  };
+
+  const handlePauseCarrier = async (isProducer: boolean,
+      serverCarrierId: string) => {
+    const carrier = findCarrier(isProducer, serverCarrierId);
+    if (!carrier) {
       return;
     }
 
     try {
-      await consumers.get(consumerId)!.resume();
+      await carrier.pause();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleResumeCarrier = async (isProducer: boolean,
+      serverCarrierId: string) => {
+    const carrier = findCarrier(isProducer, serverCarrierId);
+    if (!carrier) {
+      return;
+    }
+
+    try {
+      await carrier.resume();
     } catch (error) {
       console.log(error);
     }
@@ -184,7 +212,8 @@ const mediasoupHandler = (sockets: Set<Socket<ClientToServerEvents,
     handleTransportConnect,
     handleTransportProduce,
     handleTransportConsume,
-    handleResumeConsumer
+    handlePauseCarrier,
+    handleResumeCarrier
   }
 };
 

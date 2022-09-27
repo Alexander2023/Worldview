@@ -11,9 +11,11 @@ import { StreamData, UserMedia } from "./types";
  * Custom hook that provides access to media
  * streams of clients within the same room
  *
- * return an array containing:
+ * return an object containing:
  * - user media of the local client
  * - map with entries of socket id to user media for remote clients
+ * - function for pausing locally produced and consumed media
+ * - function for resuming locally produced and consumed media
  */
 function useWebRTC() {
   const socket = useContext(SocketContext);
@@ -218,7 +220,7 @@ function useWebRTC() {
           return new Map(prevState);
         });
 
-        socket.emit('resumeConsumer', id);
+        socket.emit('resumeCarrier', false, id);
       } catch (error) {
         console.log(error);
       }
@@ -257,16 +259,73 @@ function useWebRTC() {
       });
     };
 
+    const handleProducerPause = (consumerId: string) => {
+      const consumer = serverConsumerIdToClientConsumer.current.get(consumerId);
+      if (!consumer) {
+        return;
+      }
+
+      consumer.pause();
+    };
+
+    const handleProducerResume = (consumerId: string) => {
+      const consumer = serverConsumerIdToClientConsumer.current.get(consumerId);
+      if (!consumer) {
+        return;
+      }
+
+      consumer.resume();
+    };
+
     socket.on('updatedProducerIds', handleUpdatedProducerIds);
     socket.on('producerClose', handleProducerClose);
+    socket.on('producerPause', handleProducerPause);
+    socket.on('producerResume', handleProducerResume);
 
     return () => {
       socket.off('updatedProducerIds');
       socket.off('producerClose');
+      socket.off('producerPause');
+      socket.off('producerResume');
     }
   }, [socket]);
 
-  return [localUserMedia, socketIdToRemoteUserMedia] as const;
+  const findMediasoupCarrier = (isProducer: boolean,
+      serverCarrierId: string) => {
+    if (isProducer) {
+      return clientProducers.current.find(producer =>
+          producer.id === serverCarrierId);
+    } else {
+      return serverConsumerIdToClientConsumer.current.get(serverCarrierId);
+    }
+  };
+
+  const pauseMedia = (isProducer: boolean, serverCarrierId: string) => {
+    const mediasoupCarrier = findMediasoupCarrier(isProducer, serverCarrierId);
+    if (!mediasoupCarrier) {
+      return;
+    }
+
+    mediasoupCarrier.pause();
+    socket.emit('pauseCarrier', isProducer, serverCarrierId);
+  };
+
+  const resumeMedia = (isProducer: boolean, serverCarrierId: string) => {
+    const mediasoupCarrier = findMediasoupCarrier(isProducer, serverCarrierId);
+    if (!mediasoupCarrier) {
+      return;
+    }
+
+    mediasoupCarrier.resume();
+    socket.emit('resumeCarrier', isProducer, serverCarrierId);
+  };
+
+  return {
+    localUserMedia,
+    socketIdToRemoteUserMedia,
+    pauseMedia,
+    resumeMedia
+  };
 }
 
 export { useWebRTC };

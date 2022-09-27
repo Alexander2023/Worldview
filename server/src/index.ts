@@ -46,7 +46,8 @@ const main = async () => {
         userHandler(sockets, avatars);
 
     const {handleGetTransportOptions, handleTransportConnect,
-        handleTransportProduce, handleTransportConsume, handleResumeConsumer} =
+        handleTransportProduce, handleTransportConsume, handlePauseCarrier,
+        handleResumeCarrier} =
             mediasoupHandler(sockets, mediasoupState, socketIdToMediasoupIds);
 
     io.on('connection', async socket => {
@@ -82,7 +83,8 @@ const main = async () => {
           handleTransportProduce(socket.id, mediasoupIds, ...event));
       socket.on('transportConsume', (...event) =>
           handleTransportConsume(socket, mediasoupIds, ...event));
-      socket.on('resumeConsumer', handleResumeConsumer);
+      socket.on('pauseCarrier', handlePauseCarrier);
+      socket.on('resumeCarrier', handleResumeCarrier);
 
       socket.on('joinRoom', () => handleJoinRoom(socket, roomState));
       socket.on('sendScreen', (screen) => handleSendScreen(socket, screen));

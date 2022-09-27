@@ -47,6 +47,8 @@ interface ServerToClientEvents {
   updatedProducerIds: (producerIds: string[]) => void;
   producerClose: (consumerId: string, producerId: string,
       producerSocketId: string) => void;
+  producerPause: (consumerId: string) => void;
+  producerResume: (consumerId: string) => void;
   receiveRoom: (roomState: RoomState) => void;
   receiveScreen: (screen: Screen) => void;
   update: (avatars: [string, Avatar][]) => void;
@@ -63,7 +65,8 @@ interface ClientToServerEvents {
       rtpParameters: RtpParameters, callback: (id: string) => void) => void;
   transportConsume: (producerId: string, rtpCapabilities: RtpCapabilities,
       callback: (consumerOptions: ConsumerOptions) => void) => void;
-  resumeConsumer: (consumerId: string) => void;
+  pauseCarrier: (isProducer: boolean, serverCarrierId: string) => void;
+  resumeCarrier: (isProducer: boolean, serverCarrierId: string) => void;
   joinRoom: () => void;
   sendScreen: (screen: Screen) => void;
   sendInput: (avatar: Avatar) => void;
