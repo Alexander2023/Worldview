@@ -302,7 +302,7 @@ function useWebRTC() {
 
   const pauseMedia = (isProducer: boolean, serverCarrierId: string) => {
     const mediasoupCarrier = findMediasoupCarrier(isProducer, serverCarrierId);
-    if (!mediasoupCarrier) {
+    if (!mediasoupCarrier || mediasoupCarrier.paused) {
       return;
     }
 
@@ -312,7 +312,7 @@ function useWebRTC() {
 
   const resumeMedia = (isProducer: boolean, serverCarrierId: string) => {
     const mediasoupCarrier = findMediasoupCarrier(isProducer, serverCarrierId);
-    if (!mediasoupCarrier) {
+    if (!mediasoupCarrier || !mediasoupCarrier.paused) {
       return;
     }
 
