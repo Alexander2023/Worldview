@@ -1,6 +1,7 @@
-import './CreateScreenPage.css';
 import { useEffect, useRef, useState } from "react";
-import { HandleScreenConfig, ScreenConfig } from './types';
+
+import '../assets/css/CreateScreenPage.css';
+import { HandleScreenConfig, ScreenConfig } from '../types';
 
 interface CreateScreenPageProps {
   setIsControlPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;

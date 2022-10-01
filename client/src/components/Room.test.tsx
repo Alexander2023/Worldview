@@ -1,7 +1,7 @@
 import ReactThreeTestRenderer from '@react-three/test-renderer';
 
-import { RoomState } from '../../shared/types';
-import { socket, SocketContext } from './context/socket';
+import { RoomState } from '../../../shared/types';
+import { socket, SocketContext } from '../context/socket';
 import { Room } from './Room';
 
 const roomState: RoomState = {

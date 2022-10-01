@@ -1,6 +1,6 @@
-import './App.css';
+import './assets/css/App.css';
 import { socket, SocketContext } from './context/socket';
-import { World } from './World';
+import { World } from './components/World';
 
 function App() {
   return (

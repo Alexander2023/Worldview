@@ -1,7 +1,4 @@
 import { Socket } from "socket.io";
-import { ClientToServerEvents, ServerToClientEvents } from "../../shared/types";
-import { mediasoupHandler } from "./mediasoupHandler";
-import { MediasoupState, MediasoupIds } from "./types";
 import { WebRtcTransport as WebRtcTransportType, Producer as ProducerType, Consumer as ConsumerType, DtlsParameters, RtpParameters, RtpCapabilities} from "mediasoup/node/lib/types";
 import { Worker } from "mediasoup/node/lib/Worker";
 import { WebRtcServer } from "mediasoup/node/lib/WebRtcServer";
@@ -9,6 +6,10 @@ import { Router } from "mediasoup/node/lib/Router";
 import { WebRtcTransport } from "mediasoup/node/lib/WebRtcTransport";
 import { Consumer } from "mediasoup/node/lib/Consumer";
 import { Producer } from "mediasoup/node/lib/Producer";
+
+import { mediasoupHandler } from "./mediasoupHandler";
+import { MediasoupState, MediasoupIds } from "../types";
+import { ClientToServerEvents, ServerToClientEvents } from "../../../shared/types";
 
 const WEB_RTC_TRANSPORT_ID = '0';
 

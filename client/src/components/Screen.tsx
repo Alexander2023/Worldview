@@ -1,6 +1,7 @@
 import { useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
-import { Screen as ScreenType } from "../../shared/types";
+
+import { Screen as ScreenType } from "../../../shared/types";
 
 interface ScreenProps {
   screenData: ScreenType;

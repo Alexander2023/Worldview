@@ -4,11 +4,11 @@ import * as mediasoup from 'mediasoup';
 import { WebRtcTransport, Producer, Consumer } from "mediasoup/node/lib/types";
 
 import { Avatar, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
-import { routerConfig, socketServerConfig, webRtcServerConfig } from './config';
-import { userHandler } from './userHandler';
-import { mediasoupHandler } from './mediasoupHandler';
+import { routerConfig, socketServerConfig, webRtcServerConfig } from './data/config';
+import { userHandler } from './handlers/userHandler';
+import { mediasoupHandler } from './handlers/mediasoupHandler';
 import { MediasoupIds, MediasoupState } from './types';
-import roomState from './room-state.json';
+import roomState from './data/room-state.json';
 
 const TICK_RATE = 60;
 

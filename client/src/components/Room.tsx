@@ -2,14 +2,14 @@ import { ThreeEvent, useLoader } from "@react-three/fiber";
 import { useContext, useEffect, useState } from "react";
 import { TextureLoader, Vector2 } from "three";
 
-import { RoomState, Screen as ScreenType } from '../../shared/types';
-import { MAX_CLICKABLE_DIST } from "./constants";
-import { SocketContext } from "./context/socket";
-import concreteImg from './images/concrete.jpg';
-import marbleImg from './images/marble.jpg';
+import { RoomState, Screen as ScreenType } from '../../../shared/types';
+import { MAX_CLICKABLE_DIST } from "../data/constants";
+import { SocketContext } from "../context/socket";
+import concreteImg from '../assets/images/concrete.jpg';
+import marbleImg from '../assets/images/marble.jpg';
 import { Panel } from "./Panel";
 import { Screen } from "./Screen";
-import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
+import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "../types";
 import { Wall } from "./Wall";
 
 interface RoomProps {

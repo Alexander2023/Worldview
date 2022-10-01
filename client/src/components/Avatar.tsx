@@ -1,8 +1,9 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { BackSide, BufferGeometry, Material, Mesh, sRGBEncoding, Vector3 } from "three";
-import { UserMedia } from "./types";
-import { isWithinCameraView } from "./utils";
+
+import { UserMedia } from "../types";
+import { isWithinCameraView } from "../utils/utils";
 
 const CUBE_SIZE = 2;
 const DIRECTIONAL_MARKER_VERTICES =

@@ -1,8 +1,8 @@
 import { DtlsParameters, MediaKind, RtpParameters, RtpCapabilities, WebRtcTransport } from "mediasoup/node/lib/types";
 import { Socket } from "socket.io";
 
-import { ClientToServerEvents, ConsumerOptions, ServerToClientEvents, TransportOptions } from '../../shared/types';
-import { MediasoupIds, MediasoupState } from "./types";
+import { ClientToServerEvents, ConsumerOptions, ServerToClientEvents, TransportOptions } from '../../../shared/types';
+import { MediasoupIds, MediasoupState } from "../types";
 
 /**
  * Wrapper handler for mediasoup-related event handlers

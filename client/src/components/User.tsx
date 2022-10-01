@@ -2,9 +2,10 @@ import { PerspectiveCamera } from "@react-three/drei";
 import { RootState, useFrame } from '@react-three/fiber';
 import { useContext, useEffect, useState } from "react";
 import { Box3, Vector3 } from "three";
+
 import { CUBE_SIZE } from "./Avatar";
-import { SocketContext } from "./context/socket";
-import { HandleChosenScreenPlacement } from "./types";
+import { SocketContext } from "../context/socket";
+import { HandleChosenScreenPlacement } from "../types";
 import { PointerEffects } from "./PointerEffects";
 
 const MOVEMENT_SPEED = 20;

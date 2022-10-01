@@ -2,9 +2,9 @@ import { ThreeEvent } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { BufferGeometry, Material, Mesh, Object3D } from "three";
 
-import { Panel as PanelType } from "../../shared/types";
-import { EFFECTS_OBJECT_NAMES } from "./constants";
-import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "./types";
+import { Panel as PanelType } from "../../../shared/types";
+import { EFFECTS_OBJECT_NAMES } from "../data/constants";
+import { HandleAddBoundaryBox, HandleRemoveBoundaryBox } from "../types";
 
 interface PanelProps {
   handleAddBoundaryBox: HandleAddBoundaryBox;

@@ -1,6 +1,6 @@
-import './ControlPanel.css';
+import '../assets/css/ControlPanel.css';
 import { CreateScreenPage } from './CreateScreenPage';
-import { ScreenConfig, HandleScreenConfig } from './types';
+import { ScreenConfig, HandleScreenConfig } from '../types';
 
 const OPENED_BOTTOM_POS = '0vh';
 const CLOSED_BOTTOM_POS = 'calc(36px - 44vh)';

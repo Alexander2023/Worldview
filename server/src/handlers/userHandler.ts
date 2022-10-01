@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import { Avatar, Screen, ClientToServerEvents, ServerToClientEvents, RoomState } from '../../shared/types';
+import { Avatar, Screen, ClientToServerEvents, ServerToClientEvents, RoomState } from '../../../shared/types';
 
 /**
  * Wrapper handler for user-related event handlers

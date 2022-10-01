@@ -3,8 +3,8 @@ import { useRef, useState } from "react";
 import { BufferGeometry, Euler, Event, Intersection, Material, Matrix4, Mesh, Object3D, Quaternion, Raycaster, Vector2, Vector3 } from "three";
 import { useEventListener } from 'usehooks-ts';
 
-import { CLICKABLE_OBJECT_NAMES, EFFECTS_OBJECT_NAMES, MAX_CLICKABLE_DIST } from "./constants";
-import { HandleChosenScreenPlacement } from "./types";
+import { CLICKABLE_OBJECT_NAMES, EFFECTS_OBJECT_NAMES, MAX_CLICKABLE_DIST } from "../data/constants";
+import { HandleChosenScreenPlacement } from "../types";
 
 // Used to reduce a normalized vector to length of 0.1
 const NORMALIZED_VECTOR_DIVIDER = 10;

@@ -2,10 +2,10 @@ import { useContext, useEffect, useRef, useState } from "react";
 import * as mediasoupClient from "mediasoup-client";
 import { Device, TransportEvents, TransportOptions, RtpCapabilities, Transport, Consumer, Producer } from "mediasoup-client/lib/types";
 
-import { SocketContext } from "./context/socket";
-import { withTimeout } from "./utils";
-import { ConsumerOptions } from "../../shared/types";
-import { StreamData, UserMedia } from "./types";
+import { SocketContext } from "../context/socket";
+import { withTimeout } from "../utils/utils";
+import { ConsumerOptions } from "../../../shared/types";
+import { StreamData, UserMedia } from "../types";
 
 /**
  * Custom hook that provides access to media

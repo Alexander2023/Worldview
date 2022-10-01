@@ -3,14 +3,14 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { Box3, Object3D, Vector3 } from 'three';
 import imageCompression from 'browser-image-compression';
 
-import { Avatar as AvatarType, Screen } from '../../shared/types';
+import { Avatar as AvatarType, Screen } from '../../../shared/types';
 import { Avatar } from './Avatar';
-import { SocketContext } from './context/socket';
+import { SocketContext } from '../context/socket';
 import { ControlPanel } from './ControlPanel';
 import { Room } from './Room';
-import { ScreenConfig } from './types';
+import { ScreenConfig } from '../types';
 import { User } from './User';
-import { useWebRTC } from './useWebRTC';
+import { useWebRTC } from '../hooks/useWebRTC';
 
 const computeWorldDimensions = (imageWidth: number, imageHeight: number) => {
   const SCREEN_SCALE_FACTOR = 5;
