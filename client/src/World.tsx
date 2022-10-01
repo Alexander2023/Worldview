@@ -26,7 +26,7 @@ const computeWorldDimensions = (imageWidth: number, imageHeight: number) => {
 function World() {
   const socket = useContext(SocketContext);
 
-  useWebRTC();
+  const {socketIdToRemoteUserMedia, pauseMedia, resumeMedia} = useWebRTC();
 
   const [boundaryBoxes, setBoundaryBoxes] = useState(new Map<number, Box3>());
   const [avatars, setAvatars] = useState<[string, AvatarType][]>([]);
@@ -172,6 +172,9 @@ function World() {
             key={id}
             position={avatar.position}
             yRotation={avatar.yRotation}
+            userMedia={socketIdToRemoteUserMedia.get(id)}
+            pauseMedia={pauseMedia}
+            resumeMedia={resumeMedia}
           />
         ))}
       </Canvas>

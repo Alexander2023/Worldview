@@ -11,7 +11,7 @@ const webRtcServerConfig: WebRtcServerOptions = {
   listenInfos: [
     {
       protocol: 'udp',
-      ip: '::',
+      ip: '127.0.0.1',
       announcedIp: '127.0.0.1',
       port: 3002
     }
