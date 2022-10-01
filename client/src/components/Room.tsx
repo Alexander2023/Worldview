@@ -51,6 +51,10 @@ function Room(props: RoomProps) {
     });
 
     socket.emit('joinRoom');
+
+    return () => {
+      socket.off('receiveRoom');
+    }
   }, [socket]);
 
   if (!roomState) {
