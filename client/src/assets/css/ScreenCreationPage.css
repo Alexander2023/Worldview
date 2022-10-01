@@ -1,4 +1,4 @@
-#create-screen-page {
+#screen-creation-page {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,10 +8,10 @@
   gap: 20px;
 }
 
-#create-screen-place {
+#screen-creation-place {
   cursor: pointer;
 }
 
-#create-screen-cancel {
+#screen-creation-cancel {
   cursor: pointer;
 }

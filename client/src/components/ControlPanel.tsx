@@ -1,5 +1,5 @@
 import '../assets/css/ControlPanel.css';
-import { CreateScreenPage } from './CreateScreenPage';
+import { ScreenCreationPage } from './ScreenCreationPage';
 import { ScreenConfig, HandleScreenConfig } from '../types';
 
 const OPENED_BOTTOM_POS = '0vh';
@@ -33,7 +33,7 @@ function ControlPanel(props: ControlPanelProps) {
           <div id="control-panel-slider-button" />
       </div>
       <div id="control-panel-content" >
-        <CreateScreenPage
+        <ScreenCreationPage
           setIsControlPanelOpen={setIsOpen}
           isPlacingScreen={isPlacingScreen}
           setScreenConfig={setScreenConfig}

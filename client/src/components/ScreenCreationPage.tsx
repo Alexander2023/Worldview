@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-import '../assets/css/CreateScreenPage.css';
+import '../assets/css/ScreenCreationPage.css';
 import { HandleScreenConfig, ScreenConfig } from '../types';
 
-interface CreateScreenPageProps {
+interface ScreenCreationPageProps {
   setIsControlPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isPlacingScreen: boolean;
   setScreenConfig: React.Dispatch<React.SetStateAction<ScreenConfig | null>>;
@@ -13,7 +13,7 @@ interface CreateScreenPageProps {
 /**
  * Generates a page for creating in-world screens of images
  */
-function CreateScreenPage(props: CreateScreenPageProps) {
+function ScreenCreationPage(props: ScreenCreationPageProps) {
   const {setIsControlPanelOpen, isPlacingScreen, setScreenConfig,
       handleScreenConfig} = props;
 
@@ -55,7 +55,7 @@ function CreateScreenPage(props: CreateScreenPageProps) {
   }, [isPlacingScreen]);
 
   return (
-    <div id="create-screen-page" >
+    <div id="screen-creation-page" >
       <input
         ref={inputRef}
         type="file"
@@ -63,11 +63,11 @@ function CreateScreenPage(props: CreateScreenPageProps) {
         onChange={handleInputChange}
       />
       {isPlacingScreen ? (
-        <button id="create-screen-cancel" onClick={handleCancelClick} >
+        <button id="screen-creation-cancel" onClick={handleCancelClick} >
           Cancel
         </button>
       ) : (
-        <button id="create-screen-place" onClick={handleSubmitClick} >
+        <button id="screen-creation-place" onClick={handleSubmitClick} >
           Place Screen
         </button>
       )}
@@ -75,4 +75,4 @@ function CreateScreenPage(props: CreateScreenPageProps) {
   )
 }
 
-export { CreateScreenPage };
+export { ScreenCreationPage };
