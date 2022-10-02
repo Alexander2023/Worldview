@@ -22,8 +22,6 @@ interface RoomProps {
 
 /**
  * Generates a rectangular room populated with panels
- *
- * @returns A room populated with panels
  */
 function Room(props: RoomProps) {
   const {screens, isControlPanelOpen, setIsControlPanelOpen,
@@ -99,8 +97,6 @@ interface FrameProps {
 /**
  * Generates a rectangular frame of the room containing a floor, ceiling,
  * and walls on all four sides
- *
- * @returns A frame of the room
  */
 function Frame({handleScreenPlacementClick, roomState, ...props}: FrameProps) {
   const [concreteTexture, marbleTexture] = useLoader(TextureLoader, [
