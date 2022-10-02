@@ -94,8 +94,10 @@ function User(props: UserProps) {
       state.camera.position.z += zMovement;
     }
 
-    socket.emit('sendInput', {position: state.camera.position.toArray(),
-        yRotation: state.camera.rotation.y});
+    socket.volatile.emit('sendInput', {
+      position: state.camera.position.toArray(),
+      yRotation: state.camera.rotation.y
+    });
   });
 
   return (

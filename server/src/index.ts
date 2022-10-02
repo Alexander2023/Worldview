@@ -134,8 +134,9 @@ const main = async () => {
 
     const update = () => {
       sockets.forEach(socket => {
-        socket.emit('update', Array.from(avatars.entries()).filter(entry =>
-            entry[0] !== socket.id));
+        const updatedAvatars = Array.from(avatars.entries()).filter(entry =>
+            entry[0] !== socket.id);
+        socket.volatile.emit('update', updatedAvatars);
       });
     };
 

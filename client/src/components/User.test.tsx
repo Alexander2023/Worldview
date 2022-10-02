@@ -22,7 +22,9 @@ const dispatchKeyboardEvent = async (type: string, key: string) => {
 
 jest.mock('socket.io-client', () => ({
   io: jest.fn(() => ({
-    emit: jest.fn()
+    volatile: {
+      emit: jest.fn()
+    }
   }))
 }));
 
