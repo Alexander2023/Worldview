@@ -5,6 +5,13 @@ Worldview is a browser-based platform for the creation and use of 3D virtual roo
 multi-party collaboration. It aims to make video conferencing
 more personal and natural by supporting embedded media and by simplifying
 the process of leaving and joining groups through user-controlled movement.
+
+## Demos
+
+![Screen Placement Demo](https://github.com/Alexander2023/Worldview/blob/main/client/src/assets/images/screen-placement.gif)
+
+![User Media Demo](https://github.com/Alexander2023/Worldview/blob/main/client/src/assets/images/user-media.gif)
+
 ## Run Locally
 
 Clone the project
@@ -32,7 +39,6 @@ Set up the client
 ```
 
 Join an instance of the room by opening up a browser tab(s) and entering the following url: http://localhost:3000
-
 
 ## Future Improvements
 
